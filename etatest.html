@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobilty ETA Online</title>
+  <script src="handlebars-v4.0.5.js" charset="utf-8"></script>
+  <!-- promise.js provides a polyfill that works on windows phone edge, and needs no changes to the actual JS code -->
+  <script src="promise.js" charset="utf-8"></script>
+
+<link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo">
+    </div>
+    <h2>Mobility ETA</h2>
+    <div class="menu">
+
+    </div>
+
+  </div>
+  <div class="main">
+<!--
+    <div class="pizza-tracker">
+
+      <div class="booked future-step working" data-text="">
+        <div class="straighten"><i class="fa fa-calendar"></i>
+        </div>
+      </div>
+
+      <div class="scheduled future-step" data-text="">
+        <div class="straighten"><i class="fa fa-ticket"></i>
+
+        </div>
+      </div>
+
+      <div class="trip-soon future-step" data-text="">
+        <div class="straighten"><i class="fa fa-road"></i>
+        </div>
+      </div>
+
+      <div class="five-minutes future-step" data-text="">
+        <div class="straighten"><i class="fa fa-clock-o"></i>
+
+        </div>
+      </div>
+
+      <div class="here-now future-step" data-text="">
+        <div class="straighten"> <i class="fa fa-bell-o"></i>
+
+        </div>
+      </div>
+
+
+    </div>
+-->
+
+    <div class="text-align-center">
+      <form class="" id="unpw-form" method="post">
+        <h1>
+  Log In
+          </h1>
+        <input type="text" name="providedUsername" value="" placeholder="Client ID">
+        <br>
+        <input type="password" name="providedPassword" id="pw" value="" placeholder="Password">
+        <br><br><br>
+      </form>
+
+      <button type="button" id="login">Check My Trips</button>
+    </div>
+
+
+    <div class="container" id="output"><br><br><br> If you do not know your Client ID or Password, you can call Reservations at (404) 848-5826.<br><br> For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with questions or feedback.
+    </div>
+
+
+    <script id="entry-template" type="text/x-handlebars-template">
+      <div class="client-info text-align-center">
+        Trips for <b>{{dataFromMarta.[0].clientName}}</b><br>Checked at {{dataFromMarta.[0].updatedAt}}
+        <div id="refresh"><span class="refresh"><i class="fa fa-refresh"></i></span></div>
+        <br>
+        <br>
+
+      </div>
+      {{#each dataFromMarta.[0].bookings}} {{#unless @index}}
+      <h2>Your Next Trip</h2><br> {{/unless}}
+      <div class="booking" id="booking{{@index}}">
+
+
+        <div class="date-and-id" id="date-and-id{{@index}}">
+          <span class="display-date">{{displayDate}}</span>
+          <span class="date">{{date}}</span>
+        </div>
+
+{{#unless @index}}
+<div class="booking-status"><b>Status</b>: {{Status}}<span class="late-status"></span></div>
+<div class="gauge-container">
+  <div id="g1" class="gauge"></div>
+</div>
+                <div class="pizza-tracker">
+
+                  <div class="booked future-step" data-text="">
+                    <div class="straighten"><i class="fa fa-calendar fa-lg"></i>
+                    </div>
+                  </div>
+
+                  <div class="scheduled future-step" data-text="">
+                    <div class="straighten"><i class="fa fa-ticket fa-lg"></i>
+
+                    </div>
+                  </div>
+
+                  <div class="trip-soon future-step" data-text="">
+                    <div class="straighten"><i class="fa fa-road fa-lg"></i>
+                    </div>
+                  </div>
+
+                  <div class="five-minutes future-step" data-text="">
+                    <div class="straighten"><i class="fa fa-clock-o fa-lg"></i>
+
+                    </div>
+                  </div>
+
+                  <div class="here-now future-step" data-text="">
+                    <div class="straighten"><div class="bell"><i class="fa fa-bell-o fa-lg"></i></div>
+
+                    </div>
+                  </div>
+                </div>
+
+  {{/unless}}
+        <div>
+
+
+        </div>
+
+        <div class="times">
+
+          <center>
+                      <span class="ready-time"><b>Start Window</b>: {{displayReadyTime}}</span>
+                      <span class="ready-time"><b>End Window</b>: {{displayEndWindow}}</span>
+            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}}
+
+              {{else}}No van is scheduled for this trip.
+
+              {{/if}}</div>
+
+            <span id="details{{@index}}" class="more-details"><i class="fa fa-chevron-down" aria-hidden="true"></i>
+</span></center>
+        </div>
+        <div class="locations" id="locations{{@index}}">
+          <span class="booking-id"><b>Booking ID</b>: {{bookingID}}</span>
+          <div class="pickup"><b>From</b>: {{pickupAddress}}</div>
+          <div class="dropoff"><b>To</b>: {{dropOffAddress}}</div>
+        </div>
+      </div>
+      {{#unless @index}}
+      <h3>Future Trips</h3>{{/unless}} {{/each}}
+
+    </script>
+
+  </div>
+  <script src="raphael-2.1.4.min.js"></script>
+  <script src="justgage.js"></script>
+  <script src="https://use.fontawesome.com/11bf80d1ff.js"></script>
+  <script src="app.js">  </script>
+</body>
+
+</html>

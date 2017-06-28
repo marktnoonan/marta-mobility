@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Counter</title>
+  <meta name="viewport" content="width=device-width">
+  <style>
+    .container {
+      width: 450px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gauge {
+      width: 450px;
+      height: 450px;
+    }
+
+    a:link.button,
+    a:active.button,
+    a:visited.button,
+    a:hover.button {
+      margin: 30px 5px 0 2px;
+      padding: 7px 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="g1" class="gauge"></div>
+    <a href="#" id="g1_refresh">Random Refresh</a>
+  </div>
+  <script src="raphael-2.1.4.min.js"></script>
+  <script src="justgage.js"></script>
+  <script>
+    /*
+        There will be some math here to figure out the starting point.
+        On a clock each hour is 30 degrees, so each minute is .5 degrees.
+        Gage's donut start angle of "0" starts from the left side, so 12 noon is at
+        90 degrees on this clock. So for us, "minutes since midnight" needs to be
+        transformed in more than one way. If greater than 720, we subtract 720 from it
+        to keep is in the 12 hour clock. So then, we take the time in minutes multiplied
+        by .5 and add that to 90, giving us our actual required angle. So ... 1pm is 780
+        minutes past midnight, or 60 minutes past 12, and so we add (60/2 = 30) to 90,
+        coming up with an initial angle of 120.
+
+        Then our "value" is actually then TWICE the number of minutes that the van is late.
+        Which "lateMin" we will be returning from the API eventually. .. or maybe not?
+
+        */
+    var g1; // global for development
+
+    var timeType = "PM";
+
+    function convertToTime(minutes){
+      var niceTime;
+
+      if (minutes < 60) {
+        niceTime = "12 " + timeType;
+      }
+
+      else if (minutes < 60) {
+        // get exact time.
+      }
+
+      return "1:30 PM";
+
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+      g1 = new JustGage({
+        id: "g1",
+        value: 30,
+        min: 0,
+        max: 30,
+        textRenderer: convertToTime,
+        donut: false,
+        pointer: true,
+        gaugeWidthScale: 0.7,
+        counter: true,
+        valueFontSize: 10,
+        noGradient: true,
+        customSectors: {
+          ranges: [{
+              color: "#43bf58",
+              lo: 0,
+              hi: 5
+            }, {
+              color: "#F9C802",
+              lo: 6,
+              hi: 29,
+            },
+            {
+              color: "#ff3b30",
+              lo: 30,
+              hi: 720,
+            }
+          ]
+        }
+      });
+
+      document.getElementById('g1_refresh').addEventListener('click', function() {
+        g1.refresh(getRandomInt(0, 40));
+      });
+    });
+  </script>
+</body>
+
+</html>
