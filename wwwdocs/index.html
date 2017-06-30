@@ -5,11 +5,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mobilty ETA Online</title>
-  <script src="handlebars-v4.0.5.js" charset="utf-8"></script>
-  <!-- promise.js provides a polyfill that works on windows phone edge, and needs no changes to the actual JS code -->
-  <script src="promise.js" charset="utf-8"></script>
+  <script src="/bower_components/handlebars/handlebars.min.js" charset="utf-8"></script>
+  <script src="/bower_components/promise-polyfill/promise.js" charset="utf-8"></script>
 
-<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
@@ -23,41 +22,6 @@
 
   </div>
   <div class="main">
-<!--
-    <div class="pizza-tracker">
-
-      <div class="booked future-step working" data-text="">
-        <div class="straighten"><i class="fa fa-calendar"></i>
-        </div>
-      </div>
-
-      <div class="scheduled future-step" data-text="">
-        <div class="straighten"><i class="fa fa-ticket"></i>
-
-        </div>
-      </div>
-
-      <div class="trip-soon future-step" data-text="">
-        <div class="straighten"><i class="fa fa-road"></i>
-        </div>
-      </div>
-
-      <div class="five-minutes future-step" data-text="">
-        <div class="straighten"><i class="fa fa-clock-o"></i>
-
-        </div>
-      </div>
-
-      <div class="here-now future-step" data-text="">
-        <div class="straighten"> <i class="fa fa-bell-o"></i>
-
-        </div>
-      </div>
-
-
-    </div>
--->
-
     <div class="text-align-center">
       <form class="" id="unpw-form" method="post">
         <h1>
@@ -163,10 +127,10 @@
     </script>
 
   </div>
-  <script src="raphael-2.1.4.min.js"></script>
-  <script src="justgage.js"></script>
+  <script src="/bower_components/raphael/raphael.min.js"></script>
+  <script src="/js/justgage.js"></script>
   <script src="https://use.fontawesome.com/11bf80d1ff.js"></script>
-  <script src="app.js">  </script>
+  <script src="/js/app.js">  </script>
 </body>
 
 </html>
