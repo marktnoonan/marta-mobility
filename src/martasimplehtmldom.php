@@ -7,7 +7,9 @@
 // simple HTML DOM turns that string back into a tree that we can traverse with selectors.
 
 
-require('simple_html_dom.php');
+chdir(__DIR__);
+require_once('../vendor/autoload.php');
+require_once('../vendor/simple-html-dom/simple-html-dom/simple_html_dom.php');
 
 // if UN and PW are set, and not equal to "test" or empty strings.
 if (isset($_POST['providedUsername']) && isset($_POST['providedPassword']) && $_POST['providedUsername'] !== '' && $_POST['providedPassword'] !== '' && strtolower($_POST['providedUsername']) !== 'test' && $_POST['providedPassword'] !== 'test') {
@@ -98,7 +100,7 @@ if (isset($_POST['providedUsername']) && isset($_POST['providedPassword']) && $_
 
 
 elseif (strtolower($_POST['providedUsername']) === 'test' && $_POST['providedPassword'] === 'test') { // fetch dummy data for test user Joanna M Customer
-$html = file_get_html('MARTAEXAMPLE.html');
+$html = file_get_html('../wwwdocs/MARTAEXAMPLE.html');
 }
 
   else { // nothing posted
@@ -241,7 +243,6 @@ $html = file_get_html('MARTAEXAMPLE.html');
   next_sibling. This is daft but it works.
   */
 
-
 // this two-part loop is Trouble and includes these continue statements to ignore trip data if a trip is cancelled.
 
   foreach ($locations as $location) {
@@ -257,7 +258,6 @@ $html = file_get_html('MARTAEXAMPLE.html');
                       $arrayOfBookings[$i]["iteratorLocation"] = $i;
 
       }
-
       elseif ($location->prev_sibling()->plaintext === "Drop-off: ") {
         if ($cancelledTripExists === "halfway there!"){
           $cancelledTripExists = null;
@@ -267,19 +267,12 @@ $html = file_get_html('MARTAEXAMPLE.html');
           $i++;
 
       }
-
-
-
-
-
   }
 
 // this locates the "Past Trip" status, which can tell us that the bus has registered that the client was picked up.
   if ($html->find('span[class=smallbold]', 0)->plaintext !== "") {
     $pastTripInDom = true;
   }
-
-
 
 /*
 loop through $arrayOfBookings and find ones where date is today, and if the ETA
