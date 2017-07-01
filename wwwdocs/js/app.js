@@ -28,7 +28,7 @@ function getTrips(username, password) {
   return new Promise(function(resolve, reject) {
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', "api/index.php", true);
+    xhr.open('POST', "./api/index.php", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function() {
       if (xhr.readyState == 4 && xhr.status === 200) {
