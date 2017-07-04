@@ -48,6 +48,7 @@ function getTrips(username, password) {
 
 }
 
+// this function starts listening to firebase after data has been retrieved from the MARTA site.
 function addMartaDataToDom(xhrResponse) {
 
   var proceed = true;
@@ -64,9 +65,11 @@ function addMartaDataToDom(xhrResponse) {
     pushHandlebars();
     document.querySelector('#unpw-form').classList.add("hidden");
     document.querySelector('#login').classList.add("hidden");
+    listenToFirebase();
   } else {
     document.querySelector('#output').innerHTML = '<br><br><Br><span style="color:#ff7e72">Client ID or password not found.</span>';
   }
+
 
 }
 
@@ -85,7 +88,7 @@ function pushHandlebars() {
 
 function addListeners() {
 
- bell = document.querySelector('.bell');
+  bell = document.querySelector('.bell');
 
   document.querySelector('#refresh').addEventListener('click', function() {
     var username = document.querySelector('input[name=providedUsername]').value;
@@ -129,7 +132,7 @@ function checkDelay(windowEnd, eta) {
   var hereNowTracker = document.querySelector('.here-now');
 
   var now = new Date(); // for now
-  var nowInMinutes = (now.getHours()*60) + now.getMinutes();
+  var nowInMinutes = (now.getHours() * 60) + now.getMinutes();
 
   completeStep(bookedTracker, "Booked");
 
@@ -148,7 +151,7 @@ function checkDelay(windowEnd, eta) {
   var timeFromNow = theEtaInMinutes - nowInMinutes;
   console.log(timeFromNow);
 
-  if (timeFromNow <= 5  && timeFromNow > 0) {
+  if (timeFromNow <= 5 && timeFromNow > 0) {
     completeStep(fiveMinuteTracker, "5 min. away");
   }
 
@@ -163,14 +166,14 @@ function checkDelay(windowEnd, eta) {
 
 
   if (theEtaInMinutes > windowEndInMinutes) {
-//        etaField.style.backgroundColor = "#ff7e72";
+    //        etaField.style.backgroundColor = "#ff7e72";
     lateSatusField.textContent = ", running late.";
 
   } else if (theEtaInMinutes <= windowEndInMinutes && windowEndInMinutes - theEtaInMinutes < 30) {
-//        etaField.style.backgroundColor = '#f8efc0';
+    //        etaField.style.backgroundColor = '#f8efc0';
     lateSatusField.textContent = ", arriving in window.";
   } else {
-//        etaField.style.backgroundColor = 'darkseagreen';
+    //        etaField.style.backgroundColor = 'darkseagreen';
     lateSatusField.textContent = ", arriving on time.";
   }
 
@@ -195,55 +198,139 @@ function convertTimeToMinutes(time) {
   return timeInMinutes;
 }
 
-// guage script!
-var g1; // global for development
+/* clearly this function is where I have fallen in love with ternary expressions
+but do they make it less clear?
+*/
+function convertTimeFromMinutes(minutes) {
 
-function gaugeSetup() {
+  var minuteSegment = minutes % 60;
 
+  //adding the leading zero if needed.
+  minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
+  var hourSegment = (minutes - minuteSegment)/60;
+  var amPm = hourSegment < 12 ? "AM" : "PM";
+  var convertedHour = hourSegment < 12 ? hourSegment : hourSegment % 12;
 
-var theEtaInMinutes = convertTimeToMinutes(firstBooking.eta);
-var windowEndInMinutes = convertTimeToMinutes(firstBooking.endWindow);
-var delay = 30 - (windowEndInMinutes - theEtaInMinutes);
-
-var timeType = "PM";
-
-function convertToTime(){
-return "ETA: " + firstBooking["displayEta"];
+  return convertedHour + ":" + minuteSegment + " " + amPm;
 }
 
 
-g1 = new JustGage({
-  id: "g1",
-  value: delay,
-  min: 0,
-  max: 30,
-  minTxt: firstBooking["displayReadyTime"],
-  maxTxt: firstBooking["displayEndWindow"],
-  textRenderer: convertToTime,
-  donut: false,
-  pointer: true,
-  gaugeWidthScale: 0.7,
-  counter: true,
-  valueFontSize: 10,
-  noGradient: true,
-  customSectors: {
-    ranges: [{
-        color: "#B2C0AC",
-        lo: 0,
-        hi: 5
-      }, {
-        color: "#F8EFC0",
-        lo: 6,
-        hi: 29,
-      },
-      {
-        color: "#ff3b30",
-        lo: 30,
-        hi: 720,
-      }
-    ]
-  }
+var database = firebase.database();
+var etaRef = database.ref('eta-from-marta');
+var modifierRef = database.ref('eta-modifier');
+var dbResults = {};
+
+
+function listenToFirebase () {
+
+  modifierRef.on("value", function(snapshot){
+    dbResults.modifier = snapshot.val();
+    if (dbResults.etaFromMarta && g1) {
+    combineDelays();
+    }
+  });
+
+  etaRef.on("value", function(snapshot) {
+
+  dbResults.etaFromMarta = snapshot.val();
+  combineDelays()
+
 });
 
+ }
+
+
+function combineDelays () {
+  var theEtaInMinutes = convertTimeToMinutes(dbResults.etaFromMarta);
+  var windowEndInMinutes = convertTimeToMinutes(firstBooking.endWindow);
+
+  var newDelay = 30 - (windowEndInMinutes - theEtaInMinutes);
+  if (dbResults.modifier) {
+    newDelay += dbResults.modifier;
+  }
+  dbResults.combinedDelay = newDelay;
+  dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + dbResults.modifier);
+
+  if (g1){
+  g1.refresh(newDelay + 30);
+  }
+  else {
+    gaugeSetup(newDelay + 30);
+  }
+
+  checkDelay(firstBooking.endWindow, dbResults.newETA);
+
+  console.log("theEtaInMinutes: " + theEtaInMinutes +
+    " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);
+}
+
+
+// guage script!
+var g1; // global for development
+
+function gaugeSetup(time) {
+
+  var theEtaInMinutes = time || convertTimeToMinutes(firstBooking.eta);
+  var windowEndInMinutes = convertTimeToMinutes(firstBooking.endWindow);
+  var delay = 30 - (windowEndInMinutes - theEtaInMinutes);
+  var earlyTime = convertTimeFromMinutes(windowEndInMinutes - 60);
+
+  function convertToTime() {
+    return dbResults.newETA;
+  }
+
+
+  g1 = new JustGage({
+    id: "g1",
+    value: delay,
+    min: 0,
+    max: 60,
+    minTxt: earlyTime,
+    maxTxt: firstBooking["displayEndWindow"],
+    textRenderer: convertToTime,
+    label: "ETA",
+    donut: false,
+    pointer: true,
+    pointerOptions: {
+      toplength: -15,
+      bottomlength: 10,
+      bottomwidth: 12,
+      color: '#222',
+      stroke: '#ffffff',
+      stroke_width: 3,
+      stroke_linecap: 'round'
+    },
+    gaugeWidthScale: 0.7,
+    counter: true,
+    valueFontSize: 10,
+    noGradient: true,
+    customSectors: {
+      ranges: [{
+          color: "#C9E5BD",
+          lo: 0,
+          hi: 30
+        }, {
+          color: "#F8EFC0",
+          lo: 31,
+          hi: 59,
+        },
+        {
+          color: "#ff3b30",
+          lo: 60,
+          hi: 720,
+        }
+      ]
+    }
+  });
+
+// mess with var lirbrary defaults
+var texts = document.querySelectorAll("text");
+
+texts.forEach(function(element){
+  element.setAttribute("fill", "#000");
+});
+
+var valueLabel = document.querySelector("#g1 > svg > text:nth-child(7)");
+valueLabel.setAttribute("y", "100");
 
 }

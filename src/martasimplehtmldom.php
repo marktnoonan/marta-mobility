@@ -245,6 +245,8 @@ $html = file_get_html('../wwwdocs/MARTAEXAMPLE.html');
 
 // this two-part loop is Trouble and includes these continue statements to ignore trip data if a trip is cancelled.
 
+//TODO: handle cancelled trips better!
+
   foreach ($locations as $location) {
 
 

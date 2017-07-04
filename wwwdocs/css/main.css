@@ -27,7 +27,7 @@
     }
 
     .booking {
-      max-width: 300px;
+      width: 320px;
       background-color: #ffffff;
       margin-bottom: 20px;
       padding-bottom: 0;
@@ -39,7 +39,7 @@
 
     .booking-status {
       margin-bottom: 10px;
-      display: none;
+
     }
 
     #booking0 {
@@ -78,13 +78,13 @@
     }
 
     div.eta {
-      display: none;
       padding: 4px 10px 2px 10px;
-      /*display: inline-block;
+      display: inline-block;
       position: relative;
       border: 1px solid rgba(0, 0, 0, 0.2);
-      border-radius: 4px;*/
+      border-radius: 4px;
       margin: 6px;
+      display: none;
     }
 
     .display-date {
@@ -108,7 +108,7 @@
     }
 
     .ready-time {
-      /*display: inline-block;*/
+      display: inline-block;
       display: none;
     }
 
@@ -289,8 +289,6 @@
       transform: skewX(20deg);
     }
 
-    .is-true {}
-
     .pizza-tracker>.complete {
       background-color: darkseagreen;
       background-image: linear-gradient(to bottom, #dff0d8 0, #c8e5bc 100%);
@@ -370,13 +368,26 @@
 
   /* gauge styles */
 
+.ready-time-gage {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+/*extremely fragile selector that will need to be updated if the SVG text elements change again*/
+#g1 > svg > text:nth-child(7) {
+  font-size: 16px !important;
+}
+
+text + text {
+  font-size: 12px !important;
+}
+
+#g1 > svg {
+position: relative;
+}
+
   .gauge-container {
     margin: 0 auto;
-    margin-top: 20px;
+    margin-top: -10px;
     text-align: center;
   }
-
-  .gauge {
-/*    width: 180px;
-    height: 180px;
-*/  }
