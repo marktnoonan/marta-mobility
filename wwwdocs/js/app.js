@@ -10,7 +10,6 @@ document.querySelector('#login').addEventListener('click', function() {
 
 });
 
-
 document.querySelector('#pw').addEventListener('keyup', function(event) {
   if (event.keyCode == 13) {
     var username = document.querySelector('input[name=providedUsername]').value;
@@ -20,7 +19,6 @@ document.querySelector('#pw').addEventListener('keyup', function(event) {
 
   }
 });
-
 
 function getTrips(username, password) {
   document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>';
@@ -86,7 +84,81 @@ function pushHandlebars() {
   gaugeSetup();
 }
 
+// this will use AJAX to grab a snapshot then save it with php, then return.
+function generateReport(action) {
+  console.log("generating report for " +  action);
+
+  return "https://link.to/report";
+
+}
+
+function getHelp(action) {
+  console.log("Help requested: " + action);
+  var actionSpecificText = "We have alerted your emergency contacts ";
+
+
+switch (action) {
+  case "I am lost":
+    actionSpecificText += "that you are lost. Get directions to: <ol> <li>A saved location</li><li>Your last drop-off location</li><li>Your next pickup location</li><li>Local police</li></ol>"
+    break;
+  case "I need help":
+    actionSpecificText += "that you need help. You may wish to: <ol><li>Call 911</li><li>Get Directions</li></ol>"
+    break;
+  case "Incident Report":
+    actionSpecificText += "that you are reporting an incident."
+    break;
+  case "Crime Report":
+  actionSpecificText += "that you are reporting a crime."
+    break;
+
+  default:
+
+}
+
+  document.querySelector("#report-category").textContent = action;
+  document.querySelector("#action-specific-text").innerHTML = actionSpecificText;
+  document.querySelector(".make-report").classList.add("show");
+  window.scrollTo(0, 0);
+
+  document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + generateReport(action) + "</a>.";
+}
+
+
 function addListeners() {
+
+  var helpLink = document.querySelector(".bottom-show-menu-link");
+  var bottomMenu = document.querySelector(".bottom-menu");
+  var displayingBottomMenu = false;
+  // at this point we have logged in so we show the menu
+  bottomMenu.classList.remove("hidden");
+  var bottomMenuItems = document.querySelectorAll(".bottom-menu > div");
+  var closer = document.querySelector('span[class=closer]');
+
+
+  closer.addEventListener("click", function() {
+       document.querySelector(".make-report").classList.remove("show");
+     });
+
+
+  helpLink.addEventListener("click", function (){
+
+    if (!displayingBottomMenu) {
+      bottomMenu.classList.add("bottom-menu-display");
+      displayingBottomMenu = true;
+    } else {
+      bottomMenu.classList.remove("bottom-menu-display");
+      displayingBottomMenu = false;
+    }
+
+    (function () {for (var i = 0; i < bottomMenuItems.length; i++){
+      bottomMenuItems[i].addEventListener("click", function (event) {
+      event.stopPropagation();
+      getHelp(this.getAttribute("data-action"));
+      })
+    } } )();
+
+
+  });
 
   bell = document.querySelector('.bell');
 
@@ -113,13 +185,10 @@ function addListeners() {
           document.querySelector(locationsID).style.display = "none";
         }
       });
-    })(detailsID, locationsID); // this weird IIFE patter locks in the "i" from the iterator.
+    })(detailsID, locationsID); // this IIFE locks in the "i" from the iterator.
 
   }
 }
-
-
-
 
 function checkDelay(windowEnd, eta) {
 
@@ -207,40 +276,37 @@ function convertTimeFromMinutes(minutes) {
 
   //adding the leading zero if needed.
   minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
-  var hourSegment = (minutes - minuteSegment)/60;
+  var hourSegment = (minutes - minuteSegment) / 60;
   var amPm = hourSegment < 12 ? "AM" : "PM";
-  var convertedHour = hourSegment < 12 ? hourSegment : hourSegment % 12;
+  // converting from Military time if needed.
+  var convertedHour = hourSegment % 12;
 
   return convertedHour + ":" + minuteSegment + " " + amPm;
 }
-
 
 var database = firebase.database();
 var etaRef = database.ref('eta-from-marta');
 var modifierRef = database.ref('eta-modifier');
 var dbResults = {};
 
+function listenToFirebase() {
 
-function listenToFirebase () {
-
-  modifierRef.on("value", function(snapshot){
+  modifierRef.on("value", function(snapshot) {
     dbResults.modifier = snapshot.val();
     if (dbResults.etaFromMarta && g1) {
-    combineDelays();
+      combineDelays();
     }
   });
 
   etaRef.on("value", function(snapshot) {
 
-  dbResults.etaFromMarta = snapshot.val();
-  combineDelays()
+    dbResults.etaFromMarta = snapshot.val();
+    combineDelays()
 
-});
+  });
+}
 
- }
-
-
-function combineDelays () {
+function combineDelays() {
   var theEtaInMinutes = convertTimeToMinutes(dbResults.etaFromMarta);
   var windowEndInMinutes = convertTimeToMinutes(firstBooking.endWindow);
 
@@ -251,10 +317,9 @@ function combineDelays () {
   dbResults.combinedDelay = newDelay;
   dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + dbResults.modifier);
 
-  if (g1){
-  g1.refresh(newDelay + 30);
-  }
-  else {
+  if (g1) {
+    g1.refresh(newDelay + 30);
+  } else {
     gaugeSetup(newDelay + 30);
   }
 
@@ -263,7 +328,6 @@ function combineDelays () {
   console.log("theEtaInMinutes: " + theEtaInMinutes +
     " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);
 }
-
 
 // guage script!
 var g1; // global for development
@@ -323,14 +387,17 @@ function gaugeSetup(time) {
     }
   });
 
-// mess with var lirbrary defaults
-var texts = document.querySelectorAll("text");
+  // mess with various gauge library defaults
+  var texts = document.querySelectorAll("text");
 
-texts.forEach(function(element){
-  element.setAttribute("fill", "#000");
-});
+  texts.forEach(function(element) {
+    element.setAttribute("fill", "#000");
+  });
 
-var valueLabel = document.querySelector("#g1 > svg > text:nth-child(7)");
-valueLabel.setAttribute("y", "100");
+  var valueLabel = document.querySelector("#g1 > svg > text:nth-child(7)");
+  valueLabel.setAttribute("y", "100");
+
+  // this works to draw the line but it seems to block gage from updating
+  //document.querySelector("svg").innerHTML += '<line x1="50%" y1="0" x2="50%" y2="33" stroke="#000"></line>';
 
 }
