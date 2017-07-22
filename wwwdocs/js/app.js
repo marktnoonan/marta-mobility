@@ -1,24 +1,48 @@
-var context = {}; // context object holds data accessible to handlebars
+var context = {
+  userType: document.querySelector('select[name=user-type]').value
+}; // context object holds data accessible to handlebars
 var firstBooking = null;
 var bell = null;
+var showingMenu = false;
 
-document.querySelector('#login').addEventListener('click', function() {
-  var username = document.querySelector('input[name=providedUsername]').value;
-  var password = document.querySelector('input[name=providedPassword]').value;
+(function addStartingListeners() {
 
-  getTrips(username, password);
+  document.querySelector('.menu-open').addEventListener('click', openMenu);
 
-});
+  document.querySelector('select[name=user-type]').addEventListener('change', function() {
+    context.userType = this.value;
+  });
 
-document.querySelector('#pw').addEventListener('keyup', function(event) {
-  if (event.keyCode == 13) {
+  document.querySelector('#login').addEventListener('click', function() {
     var username = document.querySelector('input[name=providedUsername]').value;
     var password = document.querySelector('input[name=providedPassword]').value;
 
     getTrips(username, password);
+  });
 
+  document.querySelector('#pw').addEventListener('keyup', function(event) {
+    if (event.keyCode == 13) {
+      var username = document.querySelector('input[name=providedUsername]').value;
+      var password = document.querySelector('input[name=providedPassword]').value;
+
+      getTrips(username, password);
+
+    }
+  });
+})();
+
+
+function openMenu(){
+  if(!showingMenu){
+    showingMenu = true;
+    document.querySelector('.menu-panel').classList.remove("hidden");
   }
-});
+  else if(showingMenu){
+    showingMenu = false;
+    document.querySelector('.menu-panel').classList.add("hidden");
+  }
+}
+
 
 function getTrips(username, password) {
   document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>';
@@ -48,6 +72,7 @@ function getTrips(username, password) {
 
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
 function addMartaDataToDom(xhrResponse) {
+  var handlebarsTemplate = document.querySelector("#entry-template").innerHTML;
 
   var proceed = true;
 
@@ -60,7 +85,7 @@ function addMartaDataToDom(xhrResponse) {
   }
 
   if (proceed) {
-    pushHandlebars();
+    pushHandlebars(handlebarsTemplate);
     document.querySelector('#unpw-form').classList.add("hidden");
     document.querySelector('#login').classList.add("hidden");
     listenToFirebase();
@@ -71,10 +96,10 @@ function addMartaDataToDom(xhrResponse) {
 
 }
 
-function pushHandlebars() {
+function pushHandlebars(handlebarsTemplate) {
   window.scrollTo(0, 0);
-  var source = document.querySelector("#entry-template").innerHTML;
-  var template = Handlebars.compile(source);
+  var source = source;
+  var template = Handlebars.compile(handlebarsTemplate);
   var html = template(context);
   document.querySelector('#output').innerHTML = html;
 
@@ -86,7 +111,7 @@ function pushHandlebars() {
 
 // this will use AJAX to grab a snapshot then save it with php, then return.
 function generateReport(action) {
-  console.log("generating report for " +  action);
+  console.log("generating report for " + action);
 
   return "https://link.to/report";
 
@@ -97,23 +122,23 @@ function getHelp(action) {
   var actionSpecificText = "We have alerted your emergency contacts ";
 
 
-switch (action) {
-  case "I am lost":
-    actionSpecificText += "that you are lost. Get directions to: <ol> <li>A saved location</li><li>Your last drop-off location</li><li>Your next pickup location</li><li>Local police</li></ol>"
-    break;
-  case "I need help":
-    actionSpecificText += "that you need help. You may wish to: <ol><li>Call 911</li><li>Get Directions</li></ol>"
-    break;
-  case "Incident Report":
-    actionSpecificText += "that you are reporting an incident."
-    break;
-  case "Crime Report":
-  actionSpecificText += "that you are reporting a crime."
-    break;
+  switch (action) {
+    case "I am lost":
+      actionSpecificText += "that you are lost. Get directions to: <ol> <li>A saved location</li><li>Your last drop-off location</li><li>Your next pickup location</li><li>Local police</li></ol>"
+      break;
+    case "I need help":
+      actionSpecificText += "that you need help. You may wish to: <ol><li>Call 911</li><li>Get Directions</li></ol>"
+      break;
+    case "Incident Report":
+      actionSpecificText += "that you are reporting an incident. "
+      break;
+    case "Crime Report":
+      actionSpecificText += "that you are reporting a crime. "
+      break;
 
-  default:
+    default:
 
-}
+  }
 
   document.querySelector("#report-category").textContent = action;
   document.querySelector("#action-specific-text").innerHTML = actionSpecificText;
@@ -136,11 +161,11 @@ function addListeners() {
 
 
   closer.addEventListener("click", function() {
-       document.querySelector(".make-report").classList.remove("show");
-     });
+    document.querySelector(".make-report").classList.remove("show");
+  });
 
 
-  helpLink.addEventListener("click", function (){
+  helpLink.addEventListener("click", function() {
 
     if (!displayingBottomMenu) {
       bottomMenu.classList.add("bottom-menu-display");
@@ -150,12 +175,14 @@ function addListeners() {
       displayingBottomMenu = false;
     }
 
-    (function () {for (var i = 0; i < bottomMenuItems.length; i++){
-      bottomMenuItems[i].addEventListener("click", function (event) {
-      event.stopPropagation();
-      getHelp(this.getAttribute("data-action"));
-      })
-    } } )();
+    (function() {
+      for (var i = 0; i < bottomMenuItems.length; i++) {
+        bottomMenuItems[i].addEventListener("click", function(event) {
+          event.stopPropagation();
+          getHelp(this.getAttribute("data-action"));
+        })
+      }
+    })();
 
 
   });
@@ -170,24 +197,26 @@ function addListeners() {
 
   });
 
-  for (var i = 0; i < context.dataFromMarta[0].bookings.length; i++) {
+  /*
+    for (var i = 0; i < context.dataFromMarta[0].bookings.length; i++) {
 
-    var detailsID = "#details" + i;
-    var locationsID = "#locations" + i;
-    (function handleDetails(detailsID, locationsID) {
-      document.querySelector(detailsID).addEventListener("click", function() {
-        if (document.querySelector(locationsID).style.display !== "block") {
-          this.innerHTML = '<i class="fa fa-chevron-up" aria-hidden="true"></i>';
-          document.querySelector(locationsID).style.display = "block";
+      var detailsID = "#details" + i;
+      var locationsID = "#locations" + i;
+      (function handleDetails(detailsID, locationsID) {
+        document.querySelector(detailsID).addEventListener("click", function() {
+          if (document.querySelector(locationsID).style.display !== "block") {
+            this.innerHTML = '<i class="fa fa-chevron-up" aria-hidden="true"></i>';
+            document.querySelector(locationsID).style.display = "block";
 
-        } else {
-          this.innerHTML = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
-          document.querySelector(locationsID).style.display = "none";
-        }
-      });
-    })(detailsID, locationsID); // this IIFE locks in the "i" from the iterator.
+          } else {
+            this.innerHTML = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
+            document.querySelector(locationsID).style.display = "none";
+          }
+        });
+      })(detailsID, locationsID); // this IIFE locks in the "i" from the iterator.
+    }
 
-  }
+    */
 }
 
 function checkDelay(windowEnd, eta) {

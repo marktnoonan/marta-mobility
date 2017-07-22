@@ -7,32 +7,48 @@
   <title>Paratransit Pal</title>
   <script src="./bower_components/handlebars/handlebars.min.js" charset="utf-8"></script>
   <script src="./bower_components/promise-polyfill/promise.js" charset="utf-8"></script>
-<link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/main.css">
 </head>
 
 <body>
   <div class="header">
     <div class="logo">
+      <i class="fa fa-wheelchair-alt fa-lg" aria-hidden="true"></i> Paratransit Pal
     </div>
-    <h2>Paratransit Pal</h2>
-    <div class="menu">
-
+    <div class="menu-open">
+      <i class="fa fa-bars fa-lg" title="menu"></i>
     </div>
-
   </div>
+
+  <div class="menu-panel hidden">
+    <ul class="menu-list">
+      <li data-info-requested="account">My Account</li>
+      <li data-info-requested="contacts">Emergency Contacts</li>
+      <li data-info-requested="places">My Places</li>
+      <li data-info-requested="reports">My Reports</li>
+      <li data-info-requested="logout">Log Out</li>
+    </ul>
+  </div>
+
   <div class="main">
     <div class="text-align-center">
       <form class="" id="unpw-form" method="post">
         <h1>
   Log In
           </h1>
+        <select class="user-type" name="user-type">
+            <option value="Passenger">Passenger</option>
+              <option value="Driver">Driver</option>
+              <option value="Dispatcher">Dispatcher</option>
+        </select>
+        <br>
         <input type="text" name="providedUsername" value="" placeholder="Client ID">
         <br>
         <input type="password" name="providedPassword" id="pw" value="" placeholder="Password">
         <br><br><br>
       </form>
 
-      <button type="button" id="login">Check My Trips</button>
+      <button type="button" id="login">Login</button>
     </div>
 
 
@@ -40,16 +56,18 @@
     </div>
 
 
+
     <script id="entry-template" type="text/x-handlebars-template">
+
       <div class="client-info text-align-center">
-        Trips for <b>{{dataFromMarta.[0].clientName}}</b><br>Checked at {{dataFromMarta.[0].updatedAt}}
+        Trips for <b>{{dataFromMarta.[0].clientName}}</b>
+        <br>Checked at {{dataFromMarta.[0].updatedAt}}
         <div id="refresh"><span class="refresh"><i class="fa fa-refresh"></i></span></div>
         <br>
         <br>
-
       </div>
-      {{#each dataFromMarta.[0].bookings}} {{#unless @index}}
-      <h2>Your Next Trip</h2><br> {{/unless}}
+      {{#with dataFromMarta.[0].bookings.[0]}}
+      <h2>Your Next Trip</h2><br>
       <div class="booking" id="booking{{@index}}">
 
 
@@ -58,47 +76,46 @@
           <span class="date">{{date}}</span>
         </div>
 
-{{#unless @index}}
-  <div class="ready-time-gage">{{displayReadyTime}}</div>
-<div class="gauge-container">
-  <div id="g1" class="gauge"></div>
-</div>
-<span class="ready-time"><b>Start Window</b>: {{displayReadyTime}}</span>
-<span class="ready-time"><b>End Window</b>: {{displayEndWindow}}</span>
-                <div class="pizza-tracker">
+        <div class="ready-time-gage">{{displayReadyTime}}</div>
+        <div class="gauge-container">
+          <div id="g1" class="gauge"></div>
+        </div>
+        <span class="ready-time"><b>Start Window</b>: {{displayReadyTime}}</span>
+        <span class="ready-time"><b>End Window</b>: {{displayEndWindow}}</span>
+        <div class="pizza-tracker">
 
-                  <div class="booked future-step" data-text="">
-                    <div class="straighten"><i class="fa fa-calendar fa-lg"></i>
-                    </div>
-                  </div>
+          <div class="booked future-step" data-text="">
+            <div class="straighten"><i class="fa fa-calendar fa-lg"></i>
+            </div>
+          </div>
 
-                  <div class="scheduled future-step" data-text="">
-                    <div class="straighten"><i class="fa fa-ticket fa-lg"></i>
+          <div class="scheduled future-step" data-text="">
+            <div class="straighten"><i class="fa fa-ticket fa-lg"></i>
 
-                    </div>
-                  </div>
+            </div>
+          </div>
 
-                  <div class="trip-soon future-step" data-text="">
-                    <div class="straighten"><i class="fa fa-road fa-lg"></i>
-                    </div>
-                  </div>
+          <div class="trip-soon future-step" data-text="">
+            <div class="straighten"><i class="fa fa-road fa-lg"></i>
+            </div>
+          </div>
 
-                  <div class="five-minutes future-step" data-text="">
-                    <div class="straighten"><i class="fa fa-clock-o fa-lg"></i>
+          <div class="five-minutes future-step" data-text="">
+            <div class="straighten"><i class="fa fa-clock-o fa-lg"></i>
 
-                    </div>
-                  </div>
+            </div>
+          </div>
 
-                  <div class="here-now future-step" data-text="">
-                    <div class="straighten"><div class="bell"><i class="fa fa-bell-o fa-lg"></i></div>
+          <div class="here-now future-step" data-text="">
+            <div class="straighten">
+              <div class="bell"><i class="fa fa-bell-o fa-lg"></i></div>
 
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
 
-                <div class="booking-status"><b>Trip Status</b>: {{Status}}<span class="late-status"></span></div>
+        <div class="booking-status"><b>Trip Status</b>: {{Status}}<span class="late-status"></span></div>
 
-  {{/unless}}
         <div>
 
 
@@ -108,78 +125,79 @@
 
           <center>
 
-            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}}
+            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}} {{else}}No van is scheduled for this trip. {{/if}}
 
-              {{else}}No van is scheduled for this trip.
+            </div>
 
-              {{/if}}</div>
-
-            <span id="details{{@index}}" class="more-details"><i class="fa fa-chevron-down" aria-hidden="true"></i>
-</span></center>
+            <!-- Not using this right now while we are just displaying one trip.
+            <span id="details{{@index}}" class="more-details"><i class="fa fa-chevron-down" aria-hidden="true"></i> -->
+            </span>
+          </center>
         </div>
         <div class="locations" id="locations{{@index}}">
           <span class="booking-id"><b>Booking ID</b>: {{bookingID}}</span>
           <div class="pickup"><b>From</b>: {{pickupAddress}}</div>
           <div class="dropoff"><b>To</b>: {{dropOffAddress}}</div>
         </div>
-      </div>
-      {{#unless @index}}
-      <h3>Future Trips</h3>{{/unless}} {{/each}}
+      </div> {{/with}}
 
     </script>
 
   </div>
 
-<div class="bottom-menu hidden">
-  <span class="bottom-show-menu-link">Help
+  <div class="bottom-menu hidden">
+    <span class="bottom-show-menu-link">Help
 </span>
-  <a href="tel:1-678-488-3081"><div class="emergency" data-action="Call 911">
-  <i class="fa fa-ambulance fa-lg" aria-hidden="true" ></i> 911 EMERGENCY
-</div></a>
-  <div class="bottom-menu-item" data-action="I am lost">
-    <i class="fa fa-map-marker fa-2x" aria-hidden="true" ></i> <br><br>I am <b>LOST</b>
-  </div>
-  <div class="bottom-menu-item" data-action="I need help">
-    <i class="fa fa-flag fa-2x" aria-hidden="true" ></i><br><br>I need <b>HELP</b>
-  </div>
-  <div class="bottom-menu-item" data-action="Incident Report">
+    <a href="tel:1-678-488-3081">
+      <div class="emergency" data-action="Call 911">
+        <i class="fa fa-ambulance fa-lg" aria-hidden="true"></i> 911 EMERGENCY
+      </div>
+    </a>
+    <div class="bottom-menu-item" data-action="I am lost">
+      <i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <br><br>I am <b>LOST</b>
+    </div>
+    <div class="bottom-menu-item" data-action="I need help">
+      <i class="fa fa-flag fa-2x" aria-hidden="true"></i><br><br>I need <b>HELP</b>
+    </div>
+    <div class="bottom-menu-item" data-action="Incident Report">
       <i class="fa fa-info-circle fa-2x" aria-hidden="true"></i><br><br>Report <b>INCIDENT</b>
+    </div>
+    <div class="bottom-menu-item" data-action="Crime Report">
+      <i class="fa fa-gavel fa-2x" aria-hidden="true"></i><br><br>Report <b>CRIME</b>
+    </div>
   </div>
-  <div class="bottom-menu-item"  data-action="Crime Report">
-    <i class="fa fa-gavel fa-2x" aria-hidden="true"></i><br><br>Report <b>CRIME</b>
-  </div>
-</div>
 
-<div class="make-report">
-  <span class="closer">×</span>
-  <h1 id="report-category"></h1>
-  <span id="action-specific-text"></span>
-  <form class="make-report-form">
-    <b>Add to report:</b><br><br>
-<textarea name="what-happened" rows="8" cols="56"></textarea><br><br>
-<center>Add Video - Add Audio - Add Photos<br><br>
-<button type="button" name="submit-report">Complete Report</button>
-</center>
-  </form>
-</div>
+  <div class="make-report">
+    <span class="closer">×</span>
+    <h1 id="report-category"></h1>
+    <span id="action-specific-text"></span>
+    <form class="make-report-form">
+      <b>Add to report:</b><br><br>
+      <textarea name="what-happened" rows="8" cols="56"></textarea><br><br>
+      <center>Add Video - Add Audio - Add Photos<br><br>
+        <button type="button" name="submit-report">Complete Report</button>
+      </center>
+    </form>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
-    authDomain: "mobility-eta.firebaseapp.com",
-    databaseURL: "https://mobility-eta.firebaseio.com",
-    projectId: "mobility-eta",
-    storageBucket: "",
-    messagingSenderId: "142807263400"
-  };
-  firebase.initializeApp(config);
-</script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
+      authDomain: "mobility-eta.firebaseapp.com",
+      databaseURL: "https://mobility-eta.firebaseio.com",
+      projectId: "mobility-eta",
+      storageBucket: "",
+      messagingSenderId: "142807263400"
+    };
+    firebase.initializeApp(config);
+  </script>
   <script src="./bower_components/raphael/raphael.min.js"></script>
   <script src="./js/justgage.js"></script>
   <script src="https://use.fontawesome.com/11bf80d1ff.js"></script>
-  <script src="./js/app.js">  </script>
+  <script src="./js/app.js">
+  </script>
 </body>
 
 </html>
