@@ -16,15 +16,17 @@ var showingMenu = false;
   document.querySelector('#login').addEventListener('click', function() {
     var username = document.querySelector('input[name=providedUsername]').value;
     var password = document.querySelector('input[name=providedPassword]').value;
+    context.username = username;
 
     getTrips(username, password);
-    context.username = username;
+
   });
 
   document.querySelector('#pw').addEventListener('keyup', function(event) {
     if (event.keyCode == 13) {
       var username = document.querySelector('input[name=providedUsername]').value;
       var password = document.querySelector('input[name=providedPassword]').value;
+      context.username = username;
 
       getTrips(username, password);
 
@@ -110,19 +112,16 @@ function pushHandlebars(handlebarsTemplate) {
   gaugeSetup();
 }
 
-// this will use AJAX to grab a snapshot then save it with php, then return.
 function startReport(action) {
-  console.log("generating report for " + action);
-  Report(username, "", action);
+  Report(firebase, context.username, action);
   generateReport();
   return "https://link.to/report";
-
 }
 
 function getHelp(action) {
   console.log("Help requested: " + action);
+  startReport(action);
   var actionSpecificText = "We have alerted your emergency contacts ";
-
 
   switch (action) {
     case "I am lost":
@@ -150,7 +149,7 @@ function getHelp(action) {
   document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + generateReport(action) + "</a>.";
 }
 
-
+// adds
 function addListeners() {
 
   var helpLink = document.querySelector(".bottom-show-menu-link");
@@ -160,7 +159,14 @@ function addListeners() {
   bottomMenu.classList.remove("hidden");
   var bottomMenuItems = document.querySelectorAll(".bottom-menu > div");
   var closer = document.querySelector('span[class=closer]');
+  var addCommentsButton = document.querySelector("button[name=submit-report]");
 
+  addCommentsButton.addEventListener("click", function(){
+    var commentsField = document.querySelector("textarea[name=what-happened]");
+    addComments(commentsField.value);
+    commentsField.value = "";
+    document.querySelector(".make-report").classList.remove("show");
+  })
 
   closer.addEventListener("click", function() {
     document.querySelector(".make-report").classList.remove("show");
