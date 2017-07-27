@@ -18,6 +18,7 @@ var showingMenu = false;
     var password = document.querySelector('input[name=providedPassword]').value;
 
     getTrips(username, password);
+    context.username = username;
   });
 
   document.querySelector('#pw').addEventListener('keyup', function(event) {
@@ -110,9 +111,10 @@ function pushHandlebars(handlebarsTemplate) {
 }
 
 // this will use AJAX to grab a snapshot then save it with php, then return.
-function generateReport(action) {
+function startReport(action) {
   console.log("generating report for " + action);
-
+  Report(username, "", action);
+  generateReport();
   return "https://link.to/report";
 
 }

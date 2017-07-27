@@ -1,4 +1,4 @@
-function Report(firebaseInstance, userId) {
+function Report(firebaseInstance, userId, category) {
 
     var firebase = firebaseInstance;
     var userId = userId;
@@ -8,6 +8,7 @@ function Report(firebaseInstance, userId) {
         var location;
         reportData = {
             'time': (new Date()).getTime(),
+            'category': category
         };
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
