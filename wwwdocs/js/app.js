@@ -77,15 +77,9 @@ function getTrips(username, password) {
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function() {
       if (xhr.readyState == 4 && xhr.status === 200) {
-
-
         resolve(addMartaDataToDom(xhr.responseText));
-
-
       } else {
-
         reject(Error('Request failed, status was ' + xhr.statusText));
-
       }
     };
     xhr.send("providedUsername=" + username + "&providedPassword=" + password);
@@ -96,7 +90,6 @@ function getTrips(username, password) {
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
 function addMartaDataToDom(xhrResponse) {
   var handlebarsTemplate = document.querySelector("#entry-template").innerHTML;
-
   var proceed = true;
 
   // my first ever try/catch & I'm definitely doing it wrong ;)
@@ -225,26 +218,6 @@ function addListeners() {
 
   });
 
-  /*
-    for (var i = 0; i < context.dataFromMarta[0].bookings.length; i++) {
-
-      var detailsID = "#details" + i;
-      var locationsID = "#locations" + i;
-      (function handleDetails(detailsID, locationsID) {
-        document.querySelector(detailsID).addEventListener("click", function() {
-          if (document.querySelector(locationsID).style.display !== "block") {
-            this.innerHTML = '<i class="fa fa-chevron-up" aria-hidden="true"></i>';
-            document.querySelector(locationsID).style.display = "block";
-
-          } else {
-            this.innerHTML = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
-            document.querySelector(locationsID).style.display = "none";
-          }
-        });
-      })(detailsID, locationsID); // this IIFE locks in the "i" from the iterator.
-    }
-
-    */
 }
 
 function checkDelay(windowEnd, eta) {
