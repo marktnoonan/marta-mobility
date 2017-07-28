@@ -230,9 +230,10 @@ function checkDelay(windowEnd, eta) {
   var tripSoonTracker = document.querySelector('.trip-soon');
   var hereNowTracker = document.querySelector('.here-now');
 
-  var now = new Date(); // for now
+  var now = new Date();
   var nowInMinutes = (now.getHours() * 60) + now.getMinutes();
 
+  // initiating since if we have the trip in our list, it was definitely booked.
   completeStep(bookedTracker, "Booked");
 
   // if no ETA, change color and do nothing else
@@ -246,9 +247,7 @@ function checkDelay(windowEnd, eta) {
 
   var theEtaInMinutes = convertTimeToMinutes(eta);
   var windowEndInMinutes = convertTimeToMinutes(windowEnd);
-
   var timeFromNow = theEtaInMinutes - nowInMinutes;
-  console.log(timeFromNow);
 
   if (timeFromNow <= 5 && timeFromNow > 0) {
     completeStep(fiveMinuteTracker, "5 min. away");
@@ -260,23 +259,15 @@ function checkDelay(windowEnd, eta) {
 
   if (timeFromNow <= 0 && timeFromNow > -10) {
     completeStep(hereNowTracker, "Arriving now!");
-
   }
-
 
   if (theEtaInMinutes > windowEndInMinutes) {
-    //        etaField.style.backgroundColor = "#ff7e72";
     lateSatusField.textContent = ", running late.";
-
   } else if (theEtaInMinutes <= windowEndInMinutes && windowEndInMinutes - theEtaInMinutes < 30) {
-    //        etaField.style.backgroundColor = '#f8efc0';
     lateSatusField.textContent = ", arriving in window.";
   } else {
-    //        etaField.style.backgroundColor = 'darkseagreen';
     lateSatusField.textContent = ", arriving on time.";
   }
-
-
 }
 
 function completeStep(trackerElement, requiredText) {
@@ -287,23 +278,16 @@ function completeStep(trackerElement, requiredText) {
   if (requiredText === "Arriving now!") {
     bell.classList.add('bell-shake');
   }
-
 }
 
 function convertTimeToMinutes(time) {
-
   var timeInMinutes = time.split(":");
   timeInMinutes = (timeInMinutes[0] * 60) + parseInt(timeInMinutes[1]);
   return timeInMinutes;
 }
 
-/* clearly this function is where I have fallen in love with ternary expressions
-but do they make it less clear?
-*/
 function convertTimeFromMinutes(minutes) {
-
   var minuteSegment = minutes % 60;
-
   //adding the leading zero if needed.
   minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
   var hourSegment = (minutes - minuteSegment) / 60;
@@ -336,7 +320,9 @@ function listenToFirebase() {
 
   emergencyContactsRef.on("value", function(snapshot){
     dbResults.emergencyContacts = snapshot.val();
-  })
+  });
+
+  context.dbResults = dbResults;
 
 }
 
