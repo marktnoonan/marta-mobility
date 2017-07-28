@@ -22,8 +22,6 @@ a {
   width: 100%;
 }
 
-#output {}
-
 #login {
   transition: opacity 200ms ease-in;
 }
@@ -176,15 +174,16 @@ h2 {
 }
 
 .menu-panel {
-  background-color: yellowgreen;
+  background-color: lightgrey;
   position: absolute;
   top: 45px;
   right: 0;
   padding: 10px;
-  text-align: left;
+  text-align: center;
   font-weight: bold;
   font-size: 1.4em;
-
+  line-height: 1.6;
+  width: 100%;
 }
 
 .menu-list {
@@ -368,7 +367,8 @@ i {
 }
 
 
-/*extremely fragile selector that will need to be updated if the SVG text elements change again*/
+/*extremely fragile selector that will need to be updated if the SVG text
+elements change again*/
 
 #g1>svg>text:nth-child(7) {
   font-size: 16px !important;
@@ -380,7 +380,6 @@ text+text {
 
 #g1>svg {
   position: relative;
-  transfor: translateX(-10px);
 }
 
 .gauge-container {

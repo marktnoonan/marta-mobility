@@ -9,6 +9,12 @@ var showingMenu = false;
 
   document.querySelector('.menu-open').addEventListener('click', openMenu);
 
+  var menuItems = [].slice.call(document.querySelectorAll('.menu-list > li'));
+
+  for (var i = 0; i < menuItems.length; i++){
+    menuItems[i].addEventListener('click', function(){handleMenu(this.getAttribute("data-request"));})
+  }
+
   document.querySelector('select[name=user-type]').addEventListener('change', function() {
     context.userType = this.value;
   });
@@ -35,6 +41,8 @@ var showingMenu = false;
 })();
 
 
+
+
 function openMenu(){
   if(!showingMenu){
     showingMenu = true;
@@ -46,6 +54,18 @@ function openMenu(){
   }
 }
 
+function handleMenu(request){
+
+  if (request === "logout"){
+    location.reload();
+  } else if (request === "reports") {
+    // load reports list
+  } else if (request === "information") {
+    // load the "my information" panel
+
+  }
+
+}
 
 function getTrips(username, password) {
   document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>';
@@ -322,8 +342,9 @@ function convertTimeFromMinutes(minutes) {
 }
 
 var database = firebase.database();
-var etaRef = database.ref('eta-from-marta');
-var modifierRef = database.ref('eta-modifier');
+var etaRef = database.ref("eta-from-marta");
+var modifierRef = database.ref("eta-modifier");
+var emergencyContactsRef = database.ref("emergency-contacts");
 var dbResults = {};
 
 function listenToFirebase() {
@@ -336,11 +357,14 @@ function listenToFirebase() {
   });
 
   etaRef.on("value", function(snapshot) {
-
     dbResults.etaFromMarta = snapshot.val();
-    combineDelays()
-
+    combineDelays();
   });
+
+  emergencyContactsRef.on("value", function(snapshot){
+    dbResults.emergencyContacts = snapshot.val();
+  })
+
 }
 
 function combineDelays() {
