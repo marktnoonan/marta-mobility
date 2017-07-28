@@ -12,7 +12,6 @@ body {
   font-family: soleil, Helvetica, Arial, sans-serif;
   text-align: center;
   font-size: 14px;
-
   color: #444;
   background-color: #fff;
 }
@@ -185,7 +184,6 @@ h2 {
   padding: 10px;
   text-align: left;
   font-weight: bold;
-  font-size: 1.4em;
   line-height: 1.6;
   width: 100%;
 }
@@ -476,7 +474,6 @@ text+text {
     opacity: 0;
     pointer-events: none;
     transition: opacity 600ms ease-in-out;
-    width: calc(100% - 40px);
     min-height: 100vh;
     text-align: left;
     z-index: 3;
