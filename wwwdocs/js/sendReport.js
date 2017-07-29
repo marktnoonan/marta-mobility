@@ -1,5 +1,7 @@
 function Report(firebaseInstance, userId, category) {
 
+    var _reportLinkBase = window.location.hostname + "/report/";
+
     var firebase = firebaseInstance;
     var userId = userId;
     var reportId = generateReportId();
@@ -8,7 +10,8 @@ function Report(firebaseInstance, userId, category) {
         var location;
         reportData = {
             'time': (new Date()).getTime(),
-            'category': category
+            'category': category,
+            'userId' : userId
         };
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -31,6 +34,10 @@ function Report(firebaseInstance, userId, category) {
 
     this.addComments = function(comments) {
         firebase.database().ref('reports/' + reportId + '/comments').set(comments);
+    }
+
+    this.getReportLink = function() {
+        return _reportLinkBase + reportId;
     }
 
     function generateReportId() {

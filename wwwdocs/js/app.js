@@ -161,14 +161,14 @@ function pushHandlebars(handlebarsTemplate, destination) {
 }
 
 function startReport(action) {
-  Report(firebase, context.username, action);
-  generateReport();
-  return "https://link.to/report";
+  var report = new Report(firebase, context.username, action);
+  report.generateReport();
+  return report;
 }
 
 function getHelp(action) {
   console.log("Help requested: " + action);
-  startReport(action);
+  var report = startReport(action);
   var actionSpecificText = "We have alerted your emergency contacts ";
 
   switch (action) {
@@ -194,7 +194,7 @@ function getHelp(action) {
   document.querySelector(".make-report").classList.add("show");
   window.scrollTo(0, 0);
 
-  document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + generateReport(action) + "</a>.";
+  document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + report.getReportLink() + "</a>.";
 }
 
 // adds
