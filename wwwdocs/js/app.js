@@ -311,7 +311,8 @@ function completeStep(trackerElement, requiredText) {
   trackerElement.setAttribute('data-text', requiredText);
 
   if (requiredText === "Arriving now!") {
-    bell.classList.add('bell-shake');
+    //TODO: there is a bug with this line if page loads at wrong time - element doesn't exist yet.
+    //bell.classList.add('bell-shake');
   }
 }
 
