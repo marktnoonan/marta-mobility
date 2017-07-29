@@ -58,8 +58,60 @@
       Here will be the information panel!
     </div>
 
-<script id="my-info-template">
+<script id="my-info-template" type="text/x-handlebars-template">
+  <span class="closer-for-my-info">×</span>
+<h1>My Information</h1>
 
+  {{#with dbResults}}
+<section data-key="info">
+  <h2>About Me</h2>
+  <br>
+  <div class="card">
+    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+</span>
+    <span class="info-label">Name</span>: <span class="may-edit-text name">{{info.name}}</span><br>
+    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell">{{info.cell}}</span><br>
+    <span class="info-label">Email</span>: <span class="may-edit-text email">{{info.email}}</span><br>
+    <span class="info-label">Tracking</span>: <span class="may-edit tracking">{{info.track}}</span>
+    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+
+  </div>
+</section>
+<br>
+<section data-key="emergencyContacts">
+  <h2>Emergency Contacts</h2>
+  <br>
+    {{#each emergencyContacts}}
+  <div class="card">
+    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+</span>
+    <span class="info-label">Name</span>: <span class="may-edit-text name">{{@key}}</span><br>
+    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
+    <span class="info-label">Email</span>: <span class="may-edit-text email">{{this.email}}</span>
+    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+
+  </div>
+    {{/each}}
+    <div class="card"><i class="fa fa-plus" aria-hidden="true"></i>
+ Add an emergency contact</div>
+</section>
+<br>
+<section data-key="locations">
+  <h2>Saved Locations</h2>
+  <br>
+    {{#each locations}}
+  <div class="card">
+    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+</span>
+    <span class="info-label">Name</span>: <span class="may-edit-text name">{{@key}}</span><br>
+    <span class="info-label">Address</span>: <span class="may-edit-text cell">{{this}}</span><br>
+    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+  </div>
+    {{/each}}
+  <div class="card"><i class="fa fa-plus" aria-hidden="true"></i>
+ Add a new location</div>
+</section>
+  {{/with}}
 </script>
 
 
@@ -174,7 +226,7 @@
     <span id="action-specific-text"></span>
     <form class="make-report-form">
       <b>Add to report:</b><br><br>
-      <textarea name="what-happened" rows="8" cols="56"></textarea><br><br>
+      <textarea name="what-happened"></textarea><br><br>
       <center>Add Video - Add Audio - Add Photos<br><br>
         <button type="button" name="submit-report">Complete Report</button>
       </center>
