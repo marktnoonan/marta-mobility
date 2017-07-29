@@ -25,7 +25,6 @@ var showingMenu = false;
     var username = document.querySelector('input[name=providedUsername]').value;
     var password = document.querySelector('input[name=providedPassword]').value;
     context.username = username;
-
     getTrips(username, password);
 
   });
@@ -35,6 +34,7 @@ var showingMenu = false;
       var username = document.querySelector('input[name=providedUsername]').value;
       var password = document.querySelector('input[name=providedPassword]').value;
       context.username = username;
+
 
       getTrips(username, password);
 
@@ -90,7 +90,15 @@ function getTrips(username, password) {
 
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
 function addMartaDataToDom(xhrResponse) {
-  var mainHandlebarsTemplate = document.querySelector("#entry-template").innerHTML;
+
+  if (context.userType === "Passenger") {
+    var mainHandlebarsTemplate = document.querySelector("#entry-template").innerHTML;
+  } else if (context.userType === "Driver") {
+    var mainHandlebarsTemplate = document.querySelector("#driver-template").innerHTML;
+  } else if (context.userType === "Dispatcher") {
+    var mainHandlebarsTemplate = document.querySelector("#dispatcher-template").innerHTML;
+  }
+
   var mainOutputDiv = document.querySelector('#output');
   var proceed = true;
 
@@ -154,23 +162,25 @@ function pushHandlebars(handlebarsTemplate, destination) {
 
   if (firstHandlebarsPush) {
     firstBooking = context.dataFromMarta[0].bookings[0];
-    checkDelay(firstBooking.endWindow, firstBooking.eta);
-    addListeners();
-    gaugeSetup();
+    if (context.userType === "Passenger") {
+      checkDelay(firstBooking.endWindow, firstBooking.eta);
+      addListeners();
+      gaugeSetup();
+    }
     firstHandlebarsPush = false;
   }
 
 }
 
 function startReport(action) {
-  Report(firebase, context.username, action);
-  generateReport();
-  return "https://link.to/report";
+  var report = new Report(firebase, context.username, action);
+  report.generateReport();
+  return report;
 }
 
 function getHelp(action) {
   console.log("Help requested: " + action);
-  startReport(action);
+  var report = startReport(action);
   var actionSpecificText = "We have alerted your emergency contacts ";
 
   switch (action) {
@@ -196,7 +206,7 @@ function getHelp(action) {
   document.querySelector(".make-report").classList.add("show");
   window.scrollTo(0, 0);
 
-  document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + generateReport(action) + "</a>.";
+  document.querySelector("#action-specific-text").innerHTML += 'A report is being generated at <a class="report-link">' + report.getReportLink() + "</a>.";
 }
 
 // adds
@@ -355,7 +365,10 @@ function listenToFirebase() {
 
   etaRef.on("value", function(snapshot) {
     dbResults.etaFromMarta = snapshot.val();
-    combineDelays();
+    if (context.userType === "Passenger") {
+      combineDelays();
+    }
+
   });
 
   emergencyContactsRef.on("value", function(snapshot) {
@@ -386,13 +399,16 @@ function combineDelays() {
   dbResults.combinedDelay = newDelay;
   dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + dbResults.modifier);
 
-  if (g1) {
+  if (g1 && context.userType === "Passenger") {
     g1.refresh(newDelay + 30);
   } else {
     gaugeSetup(newDelay + 30);
   }
 
-  checkDelay(firstBooking.endWindow, dbResults.newETA);
+  if (context.userType === "Passenger") {
+    checkDelay(firstBooking.endWindow, dbResults.newETA);
+  }
+
 
   console.log("theEtaInMinutes: " + theEtaInMinutes +
     " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);

@@ -114,6 +114,58 @@
   {{/with}}
 </script>
 
+<script id="driver-template" type="text/x-handlebars-template">
+<div>
+<div class="driver-info">
+  <h2>Your Next Pickup</h2>
+  <br>
+Passenger: {{dataFromMarta.[0].clientName}}<br>
+  {{#with dataFromMarta.[0].bookings.[0]}}
+Date: {{date}}<br>
+Passenger Ready Time: {{displayReadyTime}}<br>
+Your ETA: {{displayEta}}<br>
+Pick Up At: {{pickupAddress}}<br>
+Drop Off At: {{dropOffAddress}}<br>
+  {{/with}}
+  <br>
+<h2>Add a Delay</h2>
+<div class="driver-delay-options">
+  <div class="driver-delay-option" data-action="SMALL">
+    Small
+  </div>
+  <div class="driver-delay-option" data-action="MEDIUM">
+    Medium
+  </div>
+  <div class="driver-delay-option" data-action="LARGE">
+    Large
+  </div>
+  <div class="driver-delay-option" data-action="MAJOR">
+    Major
+  </div>
+</div>
+
+</div>
+</script>
+
+<script id="dispatcher-template" type="text/x-handlebars-template">
+<div>
+<div class="driver-info">
+<h3>Active trip for {{dataFromMarta.[0].clientName}}</h3><br>
+  {{#with dataFromMarta.[0].bookings.[0]}}
+Date: {{date}}<br>
+Passenger Ready Time: {{displayReadyTime}}<br>
+Your ETA: {{displayEta}}<br>
+Pick Up At: {{pickupAddress}}<br>
+Drop Off At: {{dropOffAddress}}<br>
+  {{/with}}
+  <br>
+<h2>Trip info</h2>
+(delays from db etc)
+</div>
+
+</div>
+</script>
+
 
     <script id="entry-template" type="text/x-handlebars-template">
 
