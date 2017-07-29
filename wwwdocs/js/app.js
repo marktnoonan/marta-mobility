@@ -95,6 +95,8 @@ function addMartaDataToDom(xhrResponse) {
     var mainHandlebarsTemplate = document.querySelector("#entry-template").innerHTML;
   } else if (context.userType === "Driver") {
     var mainHandlebarsTemplate = document.querySelector("#driver-template").innerHTML;
+  } else if (context.userType === "Dispatcher") {
+    var mainHandlebarsTemplate = document.querySelector("#dispatcher-template").innerHTML;
   }
 
   var mainOutputDiv = document.querySelector('#output');
