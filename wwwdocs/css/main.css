@@ -431,7 +431,7 @@ text+text {
   transition: transform .4s ease-out;
 }
 
-.bottom-menu-item {
+.bottom-menu-item, .driver-delay-option {
   height: 40%;
   width: 40%;
   display: inline-block;
@@ -542,3 +542,15 @@ transition: opacity 600ms
 }
 
 /* end my info styles*/
+
+/* diver view styles */
+.driver-info {
+  text-align: left;
+}
+.driver-info > h1 {
+  margin-bottom: 20px;
+}
+.driver-delay-option {
+  border: 1px solid #666;
+}
+/* end driver view styles */
