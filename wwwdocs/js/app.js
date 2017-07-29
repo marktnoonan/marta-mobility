@@ -475,56 +475,61 @@ var turnEditing = {
 
     if(cardDiv.parentElement.getAttribute("data-key") === "emergency-contacts"){
       oldName = cardDiv.querySelector(".name").textContent;
+
     }
 
     var fieldsToEdit = this.getTextFields(cardDiv);
 
     for (var i = 0; i < fieldsToEdit.length; i++) {
       fieldsToEdit[i].setAttribute("contenteditable", true);
+      fieldsToEdit[i].setAttribute("tabindex", i);
       fieldsToEdit[i].classList.add("now-editable");
       fieldsToEdit[i].addEventListener("blur", saveToContext);
+    }
 
-      function saveToContext() {
-        var key0 = this.parentElement.parentElement.getAttribute("data-key");
-        var key1 = this.getAttribute("data-text-type");
-        var val = this.textContent;
+    function saveToContext() {
+      var key0 = this.parentElement.parentElement.getAttribute("data-key");
+      var key1 = this.getAttribute("data-text-type");
+      var val = this.textContent;
 
-        if (key0 === "saved-locations" && key1 === "short-name") {
-          // some funny business here to rename the key if needed.
-          delete context.dbResults[key0][key1];
-          context.dbResults[key0][val] = cardDiv.querySelector(".address").textContent;
-        } else if (key0 === "emergency-contacts") {
-          var newName = cardDiv.querySelector(".name").textContent;
-          var cell = cardDiv.querySelector(".cell").textContent;
-          var email = cardDiv.querySelector(".email").textContent;
+      if (key0 === "saved-locations" && key1 === "short-name") {
+        // some funny business here to rename the key if needed.
+        delete context.dbResults[key0][key1];
+        context.dbResults[key0][val] = cardDiv.querySelector(".address").textContent;
+      } else if (key0 === "emergency-contacts") {
+        var newName = cardDiv.querySelector(".name").textContent;
+        var cell = cardDiv.querySelector(".cell").textContent;
+        var email = cardDiv.querySelector(".email").textContent;
 
-          if (key1 === "name") {
-            delete context.dbResults[key0][oldName];
-            context.dbResults[key0][newName] = {
-              cell: cell,
-              email: email
-            };
-          } else {
-            context.dbResults[key0][oldName] = {
-              cell: cell,
-              email: email
-            }
-          }
+        if (key1 === "name") {
+          delete context.dbResults[key0][oldName];
+          context.dbResults[key0][newName] = {
+            cell: cell,
+            email: email
+          };
         } else {
-          context.dbResults[key0][key1] = val;
+          context.dbResults[key0][oldName] = {
+            cell: cell,
+            email: email
+          }
         }
-
-        console.log(context.dbResults);
+      } else {
+        context.dbResults[key0][key1] = val;
       }
 
+      console.log(context.dbResults);
     }
+    
     cardDiv.querySelector(".done-editing").classList.remove("hidden");
     cardDiv.querySelector(".edit").classList.add("hidden");
+    cardDiv.querySelector('.may-edit-text').focus();
 
   },
+
   offFor(cardDiv) {
     var key0 = cardDiv.parentElement.getAttribute("data-key");
     database.ref(key0).set(context.dbResults[key0]);
+
     console.log("turning off editing");
   },
   getTextFields(cardDiv) {
