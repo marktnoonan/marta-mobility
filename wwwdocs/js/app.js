@@ -471,6 +471,11 @@ function gaugeSetup(time) {
 var turnEditing = {
   onFor(cardDiv) {
     cardDiv.classList.add("now-editing-card");
+    var oldName = "no name set";
+
+    if(cardDiv.parentElement.getAttribute("data-key") === "emergency-contacts"){
+      oldName = cardDiv.querySelector(".name").textContent;
+    }
 
     var fieldsToEdit = this.getTextFields(cardDiv);
 
@@ -489,16 +494,21 @@ var turnEditing = {
           delete context.dbResults[key0][key1];
           context.dbResults[key0][val] = cardDiv.querySelector(".address").textContent;
         } else if (key0 === "emergency-contacts") {
-          if (key1 === "name") {
-            var newName = cardDiv.querySelector(".name").textContent;
-            var cell = cardDiv.querySelector(".cell").textContent;
-            var email = cardDiv.querySelector(".email").textContent;
-            //delete context.dbResults[key0][key1];
+          var newName = cardDiv.querySelector(".name").textContent;
+          var cell = cardDiv.querySelector(".cell").textContent;
+          var email = cardDiv.querySelector(".email").textContent;
 
+          if (key1 === "name") {
+            delete context.dbResults[key0][oldName];
             context.dbResults[key0][newName] = {
               cell: cell,
               email: email
             };
+          } else {
+            context.dbResults[key0][oldName] = {
+              cell: cell,
+              email: email
+            }
           }
         } else {
           context.dbResults[key0][key1] = val;
