@@ -431,7 +431,7 @@ text+text {
   transition: transform .4s ease-out;
 }
 
-.bottom-menu-item {
+.bottom-menu-item, .driver-delay-option {
   height: 40%;
   width: 40%;
   display: inline-block;
@@ -470,7 +470,7 @@ text+text {
     top: 0;
     left: 0;
     padding: 20px;
-    background-color: rgb(230, 230, 230);
+    background-color: rgb(244, 244, 244);
     opacity: 0;
     pointer-events: none;
     transition: opacity 600ms ease-in-out;
@@ -542,3 +542,15 @@ transition: opacity 600ms
 }
 
 /* end my info styles*/
+
+/* diver view styles */
+.driver-info {
+  text-align: left;
+}
+.driver-info > h1 {
+  margin-bottom: 20px;
+}
+.driver-delay-option {
+  border: 1px solid #666;
+}
+/* end driver view styles */

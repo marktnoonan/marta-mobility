@@ -9,10 +9,10 @@ $username = "hackathon";
 $password = "@hackathon";
 $debug = true;
 
-/** Sample calls **/
-// fetchNodeTemperature("ENV-ATL-0009-1", 1500328704000);
-// fetchNearbyNodes(33.754226,-84.396138);
-// fetchNearbyNodesData(33.754226,-84.396138);
+// Sample calls
+fetchNodeTemperature("ENV-ATL-0009-1", 1500328704000);
+fetchNearbyNodes(33.754226,-84.396138);
+fetchNearbyNodesData(33.754226,-84.396138);
 
 /*
  *  MAIN function that given a latitude and a longitude returns an estimated delay in minutes on the time of arrival
@@ -20,6 +20,9 @@ $debug = true;
  */
 function determineETADelay($latitude, $longitude) {
     //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
+    fetchNearbyNodes($latitude, $longitude);
+    $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
+    return $ETAModifier;
 }
 
 /** Function that renews the access token using the given username and password credentials for the nodes **/
@@ -42,6 +45,7 @@ function fetchNodeTemperature($asset_uid, $measurement_time) {
     $event_type = "TEMPERATURE";
     $start_time =   $measurement_time - $delta;
     $end_time =     $measurement_time + $delta;
+
     print "Retrieving " . $asset_uid . " environmental data...\n";
     $response = CallAPI("GET", $GLOBALS['event_url']
         . "/assets/" . $asset_uid

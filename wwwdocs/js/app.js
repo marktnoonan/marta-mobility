@@ -25,7 +25,6 @@ var showingMenu = false;
     var username = document.querySelector('input[name=providedUsername]').value;
     var password = document.querySelector('input[name=providedPassword]').value;
     context.username = username;
-
     getTrips(username, password);
 
   });
@@ -35,6 +34,7 @@ var showingMenu = false;
       var username = document.querySelector('input[name=providedUsername]').value;
       var password = document.querySelector('input[name=providedPassword]').value;
       context.username = username;
+
 
       getTrips(username, password);
 
@@ -90,7 +90,13 @@ function getTrips(username, password) {
 
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
 function addMartaDataToDom(xhrResponse) {
-  var mainHandlebarsTemplate = document.querySelector("#entry-template").innerHTML;
+
+  if (context.userType === "Passenger") {
+    var mainHandlebarsTemplate = document.querySelector("#entry-template").innerHTML;
+  } else if (context.userType === "Driver") {
+    var mainHandlebarsTemplate = document.querySelector("#driver-template").innerHTML;
+  }
+
   var mainOutputDiv = document.querySelector('#output');
   var proceed = true;
 
@@ -123,6 +129,8 @@ function showMyInfo() {
     var closer = document.querySelector('.closer-for-my-info');
     closer.addEventListener("click", function() {
       document.querySelector(".my-info-output").classList.remove("show");
+      document.querySelector(".menu-panel").classList.add("hidden");
+      showingMenu = false;
     });
 
     var editButtons = [].slice.call(document.querySelectorAll('.edit'));
@@ -152,9 +160,11 @@ function pushHandlebars(handlebarsTemplate, destination) {
 
   if (firstHandlebarsPush) {
     firstBooking = context.dataFromMarta[0].bookings[0];
-    checkDelay(firstBooking.endWindow, firstBooking.eta);
-    addListeners();
-    gaugeSetup();
+    if (context.userType === "Passenger") {
+      checkDelay(firstBooking.endWindow, firstBooking.eta);
+      addListeners();
+      gaugeSetup();
+    }
     firstHandlebarsPush = false;
   }
 
@@ -353,7 +363,10 @@ function listenToFirebase() {
 
   etaRef.on("value", function(snapshot) {
     dbResults.etaFromMarta = snapshot.val();
-    combineDelays();
+    if (context.userType === "Passenger") {
+      combineDelays();
+    }
+
   });
 
   emergencyContactsRef.on("value", function(snapshot) {
@@ -384,13 +397,16 @@ function combineDelays() {
   dbResults.combinedDelay = newDelay;
   dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + dbResults.modifier);
 
-  if (g1) {
+  if (g1 && context.userType === "Passenger") {
     g1.refresh(newDelay + 30);
   } else {
     gaugeSetup(newDelay + 30);
   }
 
-  checkDelay(firstBooking.endWindow, dbResults.newETA);
+  if (context.userType === "Passenger") {
+    checkDelay(firstBooking.endWindow, dbResults.newETA);
+  }
+
 
   console.log("theEtaInMinutes: " + theEtaInMinutes +
     " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);
@@ -471,11 +487,18 @@ function gaugeSetup(time) {
 var turnEditing = {
   onFor(cardDiv) {
     cardDiv.classList.add("now-editing-card");
+    var oldName = "no name set";
+
+    if (cardDiv.parentElement.getAttribute("data-key") === "emergency-contacts") {
+      oldName = cardDiv.querySelector(".name").textContent;
+
+    }
 
     var fieldsToEdit = this.getTextFields(cardDiv);
 
     for (var i = 0; i < fieldsToEdit.length; i++) {
       fieldsToEdit[i].setAttribute("contenteditable", true);
+      fieldsToEdit[i].setAttribute("tabindex", i);
       fieldsToEdit[i].classList.add("now-editable");
       fieldsToEdit[i].addEventListener("blur", saveToContext);
 
@@ -489,16 +512,21 @@ var turnEditing = {
           delete context.dbResults[key0][key1];
           context.dbResults[key0][val] = cardDiv.querySelector(".address").textContent;
         } else if (key0 === "emergency-contacts") {
-          if (key1 === "name") {
-            var newName = cardDiv.querySelector(".name").textContent;
-            var cell = cardDiv.querySelector(".cell").textContent;
-            var email = cardDiv.querySelector(".email").textContent;
-            //delete context.dbResults[key0][key1];
+          var newName = cardDiv.querySelector(".name").textContent;
+          var cell = cardDiv.querySelector(".cell").textContent;
+          var email = cardDiv.querySelector(".email").textContent;
 
+          if (key1 === "name") {
+            delete context.dbResults[key0][oldName];
             context.dbResults[key0][newName] = {
               cell: cell,
               email: email
             };
+          } else {
+            context.dbResults[key0][oldName] = {
+              cell: cell,
+              email: email
+            }
           }
         } else {
           context.dbResults[key0][key1] = val;
@@ -506,15 +534,30 @@ var turnEditing = {
 
         console.log(context.dbResults);
       }
-
     }
+
     cardDiv.querySelector(".done-editing").classList.remove("hidden");
     cardDiv.querySelector(".edit").classList.add("hidden");
+    cardDiv.querySelector('.may-edit-text').focus();
 
   },
+
   offFor(cardDiv) {
+    cardDiv.classList.remove("now-editing-card");
+
     var key0 = cardDiv.parentElement.getAttribute("data-key");
     database.ref(key0).set(context.dbResults[key0]);
+    var fieldsToEdit = this.getTextFields(cardDiv);
+    for (var i = 0; i < fieldsToEdit.length; i++) {
+      fieldsToEdit[i].removeAttribute("contenteditable");
+      fieldsToEdit[i].removeAttribute("tabindex");
+      fieldsToEdit[i].classList.remove("now-editable");
+    }
+
+    cardDiv.querySelector(".done-editing").classList.add("hidden");
+    cardDiv.querySelector(".edit").classList.remove("hidden");
+
+
     console.log("turning off editing");
   },
   getTextFields(cardDiv) {
