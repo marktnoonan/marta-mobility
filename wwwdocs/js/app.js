@@ -126,11 +126,16 @@ function showMyInfo() {
       });
 
     var editButtons = [].slice.call(document.querySelectorAll('.edit'));
+    var doneButtons = [].slice.call(document.querySelectorAll('.done-editing'));
     for (var i = 0; i < editButtons.length; i++) {
       editButtons[i].addEventListener("click", function(){
         turnEditing.onFor(this.parentElement);
       });
+      doneButtons[i].addEventListener("click", function () {
+        turnEditing.offFor(this.parentElement);
+      });
     }
+
 
   })();
 
@@ -351,7 +356,7 @@ function showMyInfo() {
     });
 
     emergencyContactsRef.on("value", function(snapshot) {
-      dbResults.emergencyContacts = snapshot.val();
+      dbResults["emergency-contacts"] = snapshot.val();
     });
 
     myInfoRef.on("value", function(snapshot) {
@@ -359,7 +364,7 @@ function showMyInfo() {
     });
 
     locationsRef.on("value", function(snapshot) {
-      dbResults.locations = snapshot.val();
+      dbResults["saved-locations"] = snapshot.val();
     });
 
 
@@ -471,10 +476,24 @@ function showMyInfo() {
       for (var i = 0; i < fieldsToEdit.length; i++) {
         fieldsToEdit[i].setAttribute("contenteditable", true);
         fieldsToEdit[i].classList.add("now-editable");
-        fieldsToEdit[i].addEventListener("blur", function () {
-          console.log(this.textContent, this.parentElement.parentElement.getAttribute("data-key"));
+        fieldsToEdit[i].addEventListener("blur", saveToContext);
+
+      function saveToContext() {
+        var key0 = this.parentElement.parentElement.getAttribute("data-key");
+        var key1 = this.getAttribute("data-text-type");
+        var val = this.textContent;
+
+        if (key0 === "saved-locations" && key1 === "short-name"){
+          // some funny business here to rename the key if needed.
+          delete context.dbResults[key0][key1];
+          context.dbResults[key0][val] = cardDiv.querySelector(".address").textContent;
+        } else {
+          context.dbResults[key0][key1] = val;
         }
-      );
+
+        console.log(context);
+      }
+
       }
     cardDiv.querySelector(".done-editing").classList.remove("hidden");
     cardDiv.querySelector(".edit").classList.add("hidden");
@@ -482,6 +501,7 @@ function showMyInfo() {
     },
     offFor(cardDiv){
 
+      console.log("turning off editing");
     },
     getTextFields(cardDiv){
     textFields = [].slice.call(cardDiv.querySelectorAll(".may-edit-text"));

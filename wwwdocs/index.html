@@ -69,25 +69,25 @@
   <div class="card">
     <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name">{{info.name}}</span><br>
-    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell">{{info.cell}}</span><br>
-    <span class="info-label">Email</span>: <span class="may-edit-text email">{{info.email}}</span><br>
+    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{info.name}}</span><br>
+    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell" data-text-type="cell">{{info.cell}}</span><br>
+    <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{info.email}}</span><br>
     <span class="info-label">Tracking</span>: <span class="may-edit tracking">{{info.track}}</span>
     <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
 
   </div>
 </section>
 <br>
-<section data-key="emergencyContacts">
+<section data-key="emergency-contacts">
   <h2>Emergency Contacts</h2>
   <br>
-    {{#each emergencyContacts}}
+    {{#each emergency-contacts}}
   <div class="card">
     <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name">{{@key}}</span><br>
-    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
-    <span class="info-label">Email</span>: <span class="may-edit-text email">{{this.email}}</span>
+    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{@key}}</span><br>
+    <span class="info-label" data-text-type="cell">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
+    <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{this.email}}</span>
     <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
 
   </div>
@@ -96,15 +96,15 @@
  Add an emergency contact</div>
 </section>
 <br>
-<section data-key="locations">
+<section data-key="saved-locations">
   <h2>Saved Locations</h2>
   <br>
-    {{#each locations}}
+    {{#each saved-locations}}
   <div class="card">
     <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name">{{@key}}</span><br>
-    <span class="info-label">Address</span>: <span class="may-edit-text cell">{{this}}</span><br>
+    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="short-name">{{@key}}</span><br>
+    <span class="info-label">Address</span>: <span class="may-edit-text address" data-text-type="{{@key}}">{{this}}</span><br>
     <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
   </div>
     {{/each}}
