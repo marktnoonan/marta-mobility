@@ -1,4 +1,6 @@
 <?php
+require_once './Model/Delay.php';
+require_once './Model/Asset.php';
 
 /** Globals **/
 $event_url = "https://ic-event-service.run.aws-usw02-pr.ice.predix.io/v2";
@@ -7,12 +9,13 @@ $client_token = "";
 $env_zone_id = "SDSIM-IE-ENVIRONMENTAL";
 $username = "hackathon";
 $password = "@hackathon";
-$debug = true;
+$debug = false;
 
 // Sample calls
-fetchNodeTemperature("ENV-ATL-0009-1", 1500328704000);
-fetchNearbyNodes(33.754226,-84.396138);
-fetchNearbyNodesData(33.754226,-84.396138);
+//fetchNodeTemperature("ENV-ATL-0009-1", 1500328704000);
+//fetchNearbyNodes(33.754226,-84.396138);
+//fetchNearbyNodesData(33.754226,-84.396138);
+determineETADelay(33.754226,-84.396138);
 
 /*
  *  MAIN function that given a latitude and a longitude returns an estimated delay in minutes on the time of arrival
@@ -20,9 +23,13 @@ fetchNearbyNodesData(33.754226,-84.396138);
  */
 function determineETADelay($latitude, $longitude) {
     //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
-    fetchNearbyNodes($latitude, $longitude);
+    fetchNearbyNodesData($latitude, $longitude);
     $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
     return $ETAModifier;
+}
+
+function gatherReportData($latitude, $longitude){
+
 }
 
 /** Function that renews the access token using the given username and password credentials for the nodes **/
@@ -61,9 +68,15 @@ function fetchNodeTemperature($asset_uid, $measurement_time) {
 
 /** Function that given a latitude and longitude retrieves and returns an array with the nearby nodes temperature and traffic data **/
 function fetchNearbyNodesData($xcenter, $ycenter){
-    $nearby_nodes = fetchNearbyNodes($xcenter, $ycenter);
-    // TODO: Iterate through each node and retrieve its data
-    var_dump($nearby_nodes);
+
+    // Get the nearby nodes to the given coordinates
+    $nearby_nodes_response = fetchNearbyNodes($xcenter, $ycenter);
+    $nearby_nodes_associative_array = json_decode($nearby_nodes_response, true);
+    $nodesArray = Asset::parseNodes($nearby_nodes_associative_array);
+
+    // Retrieve additional node data
+
+    return $nodesArray;
 }
 
 /** Function that given a latitude and longitude retrieves and returns an array with the nearby nodes **/
@@ -79,12 +92,16 @@ function fetchNearbyNodes($xcenter, $ycenter){
     $page = 0;
     $size = 10;
 
-    print "Bounding box is: " . $bbox_x1 . ", " .$bbox_y1 . " : " . $bbox_x2 . ", " . $bbox_y2 . "\n";
+    if($GLOBALS['debug']) {
+        print "Bounding box is: " . $bbox_x1 . ", " .$bbox_y1 . " : " . $bbox_x2 . ", " . $bbox_y2 . "\n";
+    }
     $asset_type = "ENV_SENSOR";
     $event_type = "TEMPERATURE";
     $request_uri = "/assets/search?";
 
-    print "Retrieving " . $xcenter . ", " . $ycenter . " nearby nodes...\n";
+    if($GLOBALS['debug']) {
+        print "Retrieving " . $xcenter . ", " . $ycenter . " nearby nodes...\n";
+    }
 
     $response = CallAPI("GET", $GLOBALS['metadata_url'] . $request_uri
         . "bbox=" . $bbox_x1 . ":" . $bbox_y1 . "," . $bbox_x2 . ":" . $bbox_y2
@@ -96,6 +113,8 @@ function fetchNearbyNodes($xcenter, $ycenter){
     if($GLOBALS['debug']) {
         var_dump($response);
     }
+
+    // Parse the node response
     return $response;
 }
 
