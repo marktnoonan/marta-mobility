@@ -2,3 +2,5 @@
 /vendor
 /wwwdocs/bower_components
 node_modules/
+.idea/
+
