@@ -67,6 +67,27 @@ function handleMenu(request) {
 
 }
 
+
+function getNodeData(lat, long, resource) {
+
+  return new Promise(function(resolve, reject) {
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', "../src/IntelligentCities.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(console.log(xhr.responseText));
+      } else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
+  });
+
+}
+
+
 function getTrips(username, password) {
 
   /* let's not do the spinner for now
@@ -125,15 +146,38 @@ function addMartaDataToDom(xhrResponse) {
 
 function showMyReports() {
 
+
+    var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
+    var myInfoOutput = document.querySelector('.my-info-output');
+
   for (var theReport in dbResults.reports) {
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = reportTime.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(reportTime.toTimeString().substr(0, 5)));
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
+
+    var lat = dbResults.reports[theReport].location.latitude;
+    var long = dbResults.reports[theReport].location.longitude;
+    reverseGeocode(lat,long);
   }
 
-  var myInfoTemplate = document.querySelector('#my-reports-template').innerHTML;
-  var myInfoOutput = document.querySelector('.my-info-output');
-  pushHandlebars(myInfoTemplate, myInfoOutput);
+function reverseGeocode(lat, long){
+  var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
+
+  return new Promise(function(resolve, reject) {
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET",url,false);
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(dbResults.reports[theReport]["prettyAddress"] = JSON.parse(xhr.responseText).results[0].formatted);
+      } else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send(null);
+  });
+}
+  pushHandlebars(myReportTemplate, myInfoOutput);
   myInfoOutput.classList.add("show");
 
   (function addMyInfoListeners() {
@@ -144,7 +188,6 @@ function showMyReports() {
       showingMenu = false;
     });
   })();
-
 }
 
 function showMyInfo() {
@@ -276,7 +319,6 @@ function addListeners() {
         })
       }
     })();
-
 
   });
 

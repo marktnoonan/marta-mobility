@@ -22,7 +22,7 @@ if (isset($_POST['providedUsername']) && isset($_POST['providedPassword']) && $_
 } elseif (strtolower($_POST['providedUsername']) === 'test' && $_POST['providedPassword'] === 'test') { // fetch dummy data for test user Joanna M Customer
     $html = file_get_html('../wwwdocs/MARTAEXAMPLE.html');
 } else { // nothing posted
-    exit("username or password is missing!");
+  exit("username or password is missing!");
 }
 
 
@@ -171,11 +171,11 @@ function formatTime($time) {
     }
 }
 
-function datesAndTimes($arrayOfBookings, $datesAndTimes) 
+function datesAndTimes($arrayOfBookings, $datesAndTimes)
 {
     global $currentDay, $currentTimeInMinutes, $tomorrow;
 
-    $i = 0;  
+    $i = 0;
     foreach ($datesAndTimes as $dateOrTimeNugget) {
         // nuggets are what we pull out of the DOM, all need a little different parsing.
         $nugget = $dateOrTimeNugget->plaintext;
