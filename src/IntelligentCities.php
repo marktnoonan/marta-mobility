@@ -5,6 +5,12 @@ require_once './Model/Asset.php';
 $client_token = "";
 $debug = false;
 
+/*
+
+*/
+
+
+
 class IntelligentCities {
     /** Constants **/
     const eventURL = "https://ic-event-service.run.aws-usw02-pr.ice.predix.io/v2";
@@ -20,7 +26,7 @@ class IntelligentCities {
      */
     public static function determineETADelay($latitude, $longitude) {
         $time = 1500328704000; // On a real environment we would use time() * 1000
-        IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
+        // IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
         //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
 
         $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result

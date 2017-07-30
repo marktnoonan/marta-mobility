@@ -554,6 +554,10 @@ transition: opacity 600ms
   color: #444;
 }
 
+.fetching-reports{
+  
+}
+
 .card {
   padding: 10px;
   background-color: #d8d8d8;

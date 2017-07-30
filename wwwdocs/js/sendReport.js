@@ -32,6 +32,8 @@ function Report(firebaseInstance, userId, category) {
         firebase.database().ref('reports/' + reportId).set(reportData);
     }
 
+    
+
     this.addComments = function(comments) {
         firebase.database().ref('reports/' + reportId + '/comments').set(comments);
     }

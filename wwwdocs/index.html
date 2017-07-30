@@ -65,12 +65,13 @@
 <h1>My Reports</h1>
   {{#each dbResults.reports}}
   <div class="card">
-  <span class="info-label">Time</span>: {{prettyTime}} <br>
+  <span class="info-label">Date and Time of report</span>: {{prettyTime}} <br>
   <span class="info-label">Report Category</span>: {{category}}<br>
-  <span class="info-label">Incident Location</span>: {{location.latitude}}, {{location.longitude}}<br>
+  <span class="info-label">Report Area</span>: Near {{prettyAddress}}<br>
+  <span class="info-label">Incident Comments</span>: {{comments}}<br>  
+  <span class="info-label">Exact Location</span>: {{location.latitude}}, {{location.longitude}}<br>
 </div>
 {{/each}}
-  HEYHEYHEYHEYHEY
 </script>
 
 <script id="my-info-template" type="text/x-handlebars-template">
