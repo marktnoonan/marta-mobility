@@ -71,7 +71,7 @@ function handleMenu(request) {
 function getTrips(username, password) {
 
   /* let's not do the spinner for now
-    
+
   document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>'; */
 
   return new Promise(function(resolve, reject) {
@@ -260,13 +260,15 @@ function addListeners() {
 
   bell = document.querySelector('.bell');
 
-  document.querySelector('#refresh').addEventListener('click', function() {
+// not using refresh button since we connected to firebase
+
+/*  document.querySelector('#refresh').addEventListener('click', function() {
     var username = document.querySelector('input[name=providedUsername]').value;
     var password = document.querySelector('input[name=providedPassword]').value;
 
     getTrips(username, password);
 
-  });
+  });*/
 
 }
 
@@ -572,6 +574,5 @@ var turnEditing = {
 
 }
 
-window.onload = function(){
+// when all else is done...
   document.querySelector(".form-wrapper").classList.add("show");
-}
