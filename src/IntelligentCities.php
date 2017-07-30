@@ -3,7 +3,7 @@ require_once './Model/DebugVerbosity.php';
 require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
-$client_token = "";
+$client_token = null;
 $debug = DebugVerbosity::MINOR;
 
 class IntelligentCities {
@@ -43,6 +43,28 @@ class IntelligentCities {
         if($GLOBALS['debug']) {
             print $GLOBALS['client_token']->{'access_token'} != "" . "\n";
         }
+    }
+
+    /**
+     * Function that given the unique id of an parent asset, retrieves all the available sub assets on it
+     **/
+    private static function fetchNodeAssets($assetUid, $eventType, $measurementTime) {
+        IntelligentCities::validateToken();
+
+        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
+        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
+        $start_time =   $measurementTime - $delta;
+        $end_time =     $measurementTime;
+
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::eventURL
+            . "/assets/" . $assetUid
+            . "/events?eventType=". $eventType
+            . "&startTime=" . $start_time . "&endTime=" . $end_time
+        );
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($response);
+        }
+        return $response;
     }
 
     /** Function that given the unique id of an asset, retrieves and returns the current registered event data
@@ -153,8 +175,10 @@ class IntelligentCities {
 
     /** Function that checks whether the token is valid or expired and returns a boolean with true if the token is still valid **/
     private static function validateToken(){
-        // TODO: Verify the token is still valid before refreshing it and handle exceptions as invalid credentials
-        IntelligentCities::refreshToken();
+        // TODO: Verify the token is still valid and handle exceptions such as invalid credentials
+        if($GLOBALS['client_token'] == null) {
+            IntelligentCities::refreshToken();
+        }
     }
 
     /**

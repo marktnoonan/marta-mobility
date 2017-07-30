@@ -16,8 +16,8 @@ class Asset {
     public $vehicleCount;
 
     // Situational Awareness Data
-    public $photo_url;
-    public $video_url;
+    public $photoUrl;
+    public $videoUrl;
 
     function __construct($parentAssetUid, $envAssetUid, $coordinates, $temperature = 0, $humidity = 0, $pressure = 0, $vehicleSpeed = 0, $vehicleCount = 0) {
         $this->envAssetUid = $envAssetUid;
@@ -65,7 +65,8 @@ class Asset {
         }
         return $asset;
     }
-    public static function parseNodeAwarenessData(&$asset, $temperatureData, $humidityData, $pressureData){
-        // TODO: Implement
+    public static function parseNodeAwarenessData(&$asset, $awarenessData){
+        // TODO: Implement and remove mock data
+        $asset->photoUrl = "https://ic-media-service.run.asv-pr.ice.predix.io/v2/mediastore/file/CAMERA-HYP1083-CAM-L_CAMERA-HYP1083-CAM-L_1459816592756_IMAGE.jpg";
     }
 }
