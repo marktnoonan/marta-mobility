@@ -23,6 +23,9 @@ a {
 .main {
   margin-top: 12px;
   width: 100%;
+  background-image: url("../assets/paratransitpal1.jpg");
+  background-repeat: no-repeat;
+  background-position: 50% 20%;
 }
 
 #login {
@@ -50,6 +53,26 @@ input, button, select {
   padding: 6px;
   border: 1px solid #696969;
   border-radius: 4px;
+}
+
+.log-in {
+  font-size: 12px;
+  padding-bottom: 2px;
+  margin-bottom: 0;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.form-wrapper {
+  display: inline-block;
+  border: 1px solid rgba(100,100,100,0.5);
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  margin-top: 140px;
+  padding: 10px;
+  width: 250px;
+  pointer-events: 0;
+  opacity: 0;
 }
 
 input, select {
@@ -170,6 +193,12 @@ h2 {
   font-size: 1.6em;
 }
 
+.logo-img{
+  position: absolute;
+  top: 40px;
+  margin: auto;
+}
+
 .menu-open {
   margin-top: 3px;
   float: right;
@@ -177,7 +206,7 @@ h2 {
 }
 
 .menu-panel {
-  background-color: lightgrey;
+  background-color: #52A7B4;
   position: absolute;
   top: 45px;
   right: 0;
@@ -205,19 +234,18 @@ h2 {
   border-radius: 4px;
 }
 
-form {
-  margin-top: 130px;
-}
 
 .header {
   top: 0;
   z-index: 900;
   text-align: center;
   background: #dedede;
-  background-image: linear-gradient(to bottom, #fff 0, #f8f8f8 100%);
+  background-image: linear-gradient(to top, #52A7B4 0, #f8f8f8 100%);
   padding: 10px;
   margin-top: 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .invisible {
@@ -400,11 +428,11 @@ text+text {
 
 /* bottom menu styles */
 .bottom-show-menu-link {
-  color: #fff;
+  color: #111;
   font-size: 1.5em;
   position: inherit;
   transform: translate(-50%, -50px);
-  background-color: #333;
+  background-color: #52A7B4;
   height: 90px;
   width: 90px;
   padding: 9px;
@@ -421,7 +449,8 @@ text+text {
   bottom: 0;
   width: 100%;
   text-align: center;
-  background-color: #333;
+  background-color: #52A7B4;
+  background-image: linear-gradient(to bottom, #52A7B4 50%, #f8f8f8 100%);
   transform: translateY(288px);
   transition: transform .4s ease-out;
 }
@@ -470,7 +499,8 @@ text+text {
     top: 0;
     left: 0;
     padding: 20px;
-    background-color: rgb(244, 244, 244);
+    background-color: #52A7B4;
+    color: #111;
     opacity: 0;
     pointer-events: none;
     transition: opacity 600ms ease-in-out;
@@ -489,7 +519,7 @@ text+text {
 }
 
 .show {
-  opacity: 1;
+opacity: 1;
 pointer-events: all;
 transition: opacity 600ms
 }

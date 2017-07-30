@@ -29,11 +29,11 @@
   </div>
 
   <div class="main">
-    <div class="text-align-center">
+    <div class="text-align-center form-wrapper">
       <form class="" id="unpw-form" method="post">
-        <h1>
-  Log In
-          </h1>
+        <h1 class="log-in">
+  Log In As:
+</h1><br>
         <select class="user-type" name="user-type">
             <option value="Passenger">Passenger</option>
               <option value="Driver">Driver</option>
@@ -47,10 +47,12 @@
       </form>
 
       <button type="button" id="login">Login</button>
+      <br><br><br>
+      For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with questions or feedback.
     </div>
 
 
-    <div class="container" id="output"><br><br><br> If you do not know your Client ID or Password, you can call Reservations at (404) 848-5826.<br><br> For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with questions or feedback.
+    <div class="container" id="output">
     </div>
 
 
@@ -149,6 +151,7 @@ Drop Off At: {{dropOffAddress}}<br>
 
 <script id="dispatcher-template" type="text/x-handlebars-template">
 <div>
+  <h1> Dispatcher </h1>
 <div class="driver-info">
 <h3>Active trip for {{dataFromMarta.[0].clientName}}</h3><br>
   {{#with dataFromMarta.[0].bookings.[0]}}
@@ -160,6 +163,10 @@ Drop Off At: {{dropOffAddress}}<br>
   {{/with}}
   <br>
 <h2>Trip info</h2>
+<br>
+{{#with dbResults}}
+ETA: <span class="eta-from-db"></span>
+{{/with}}
 (delays from db etc)
 </div>
 
@@ -171,8 +178,7 @@ Drop Off At: {{dropOffAddress}}<br>
 
       <div class="client-info text-align-center">
         Trips for <b>{{dataFromMarta.[0].clientName}}</b>
-        <br>Checked at {{dataFromMarta.[0].updatedAt}}
-        <div id="refresh"><span class="refresh"><i class="fa fa-refresh"></i></span></div>
+</span></div>
         <br>
         <br>
       </div>
