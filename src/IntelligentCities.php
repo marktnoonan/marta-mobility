@@ -4,7 +4,7 @@ require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
 $client_token = null;
-$debug = DebugVerbosity::MINOR;
+$debug = DebugVerbosity::PRODUCTION;
 
 if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'])){
   $postedLat = $_POST['myLat'];
