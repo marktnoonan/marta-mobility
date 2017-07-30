@@ -2,6 +2,7 @@
 
 class Asset {
     public $assetUid;
+    public $parentAssetUid;
     public $coordinates;
 
     // Environmental Planning Data
@@ -17,8 +18,9 @@ class Asset {
     public $photo_url;
     public $video_url;
 
-    function __construct($assetUid, $coordinates, $temperature = 0, $humidity = 0, $pressure = 0, $vehicleSpeed = 0, $vehicleCount = 0) {
+    function __construct($parentAssetUid, $assetUid, $coordinates, $temperature = 0, $humidity = 0, $pressure = 0, $vehicleSpeed = 0, $vehicleCount = 0) {
         $this->assetUid = $assetUid;
+        $this->parentAssetUid = $parentAssetUid;
         $this->coordinates = $coordinates;
         $this->temperature = $temperature;
         $this->humidity = $humidity;
@@ -30,6 +32,7 @@ class Asset {
     public static function parseNode($assetDataArray) {
         var_dump($assetDataArray);
         $asset = new Asset(
+            $assetDataArray['parentAssetUid'],
             $assetDataArray['assetUid'],
             $assetDataArray['coordinates']
         );
@@ -42,10 +45,13 @@ class Asset {
             array_push($assetArray,Asset::parseNode($asset));
         }
         unset($asset);
-        var_dump($assetArray);
         return $assetArray;
     }
-    public static function parseNodeEnvironmentalData($node, $environmentalData){
-
+    public static function parseNodeEnvironmentalData(&$node, $environmentalData){
+        $node->temperature = $environmentalData['content'][0]['measures']['mean'];
+        if($GLOBALS['debug']) {
+            var_dump($environmentalData);
+        }
+        return $node;
     }
 }

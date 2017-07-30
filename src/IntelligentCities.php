@@ -11,16 +11,18 @@ class IntelligentCities {
     const metadata_url = "https://ic-metadata-service.run.aws-usw02-pr.ice.predix.io/v2/metadata";
     const env_zone_id = "SDSIM-IE-ENVIRONMENTAL";
     const username = "hackathon";
-    const password = "@hackathon";
-    const debug = true;
+    const password = "@hackathon"; // TODO: Move the username and password to a safer place.
+    const debug = false;
 
     /*
      *  MAIN function that given a latitude and a longitude returns an estimated delay in minutes on the time of arrival
      *  given its nearby nodes environmental and traffic information.
      */
     public static function determineETADelay($latitude, $longitude) {
+        $time = 1500328704000; // On a real environment we would use time() * 1000
+        IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
         //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
-        IntelligentCities::fetchNearbyNodesData($latitude, $longitude);
+
         $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
         return $ETAModifier;
     }
@@ -51,13 +53,13 @@ class IntelligentCities {
         IntelligentCities::validateToken();
 
         // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-        $delta = 1 * pow(60, 3);
+        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
         $event_type = "TEMPERATURE";
         $start_time =   $measurement_time - $delta;
-        $end_time =     $measurement_time + $delta;
+        $end_time =     $measurement_time;
 
         print "Retrieving " . $asset_uid . " environmental data...\n";
-        $response = IntelligentCities::CallAPI("GET", IntelligentCities::event_url
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::eventURL
             . "/assets/" . $asset_uid
             . "/events?eventType=". $event_type
             . "&startTime=" . $start_time . "&endTime=" . $end_time
@@ -68,27 +70,33 @@ class IntelligentCities {
         return $response;
     }
 
-
     /**
-     * Function that given a latitude and longitude retrieves and returns an array with the nearby nodes temperature and traffic data
+     * Function that given a latitude and longitude retrieves and returns an array with the nearby nodes containing temperature and traffic data
      * fetchNearbyNodesData(33.754226,-84.396138);
      **/
-    private static function fetchNearbyNodesData($xCenter, $yCenter){
+    private static function fetchNearbyAssetsData($xCenter, $yCenter, $measurementTime){
 
         // Get the nearby nodes to the given coordinates
-        $nearbyNodesResponse = IntelligentCities::fetchNearbyNodes($xCenter, $yCenter);
-        $nearbyNodesAssociativeArray = json_decode($nearbyNodesResponse, true);
-        $nodesArray = Asset::parseNodes($nearbyNodesAssociativeArray);
+        $nearbyAssetsResponse = IntelligentCities::fetchNearbyAssets($xCenter, $yCenter);
+        $nearbyAssetsAssociativeArray = json_decode($nearbyAssetsResponse, true);
+        $assetArray = Asset::parseNodes($nearbyAssetsAssociativeArray);
 
         // Retrieve additional node data
-        return $nodesArray;
+        foreach ($assetArray as $asset) {
+
+            $assetEnvironmentalResponse = IntelligentCities::fetchNodeTemperature($asset->assetUid, $measurementTime);
+            $assetEnvironmentalData = json_decode($assetEnvironmentalResponse, true);
+            Asset::parseNodeEnvironmentalData($asset, $assetEnvironmentalData);
+        }
+        var_dump($assetArray);
+        return $assetArray;
     }
 
     /**
      * Function that given a latitude and longitude retrieves and returns an array with the nearby nodes
      * fetchNearbyNodes(33.754226,-84.396138);
      **/
-    private static function fetchNearbyNodes($xcenter, $ycenter){
+    private static function fetchNearbyAssets($xcenter, $ycenter){
         IntelligentCities::validateToken();
         $km_radious = 1 * 0.01; // GPS resolution second decimal place worth up to 1.1km
 
