@@ -1,8 +1,9 @@
 <?php
 
 class Asset {
-    public $assetUid;
     public $parentAssetUid;
+    public $envAssetUid;
+    public $tfevtAssetUid;
     public $coordinates;
 
     // Environmental Planning Data
@@ -18,19 +19,18 @@ class Asset {
     public $photo_url;
     public $video_url;
 
-    function __construct($parentAssetUid, $assetUid, $coordinates, $temperature = 0, $humidity = 0, $pressure = 0, $vehicleSpeed = 0, $vehicleCount = 0) {
-        $this->assetUid = $assetUid;
+    function __construct($parentAssetUid, $envAssetUid, $coordinates, $temperature = 0, $humidity = 0, $pressure = 0, $vehicleSpeed = 0, $vehicleCount = 0) {
+        $this->envAssetUid = $envAssetUid;
         $this->parentAssetUid = $parentAssetUid;
         $this->coordinates = $coordinates;
-        $this->temperature = $temperature;
-        $this->humidity = $humidity;
-        $this->pressure = $pressure;
+        $this->temperature = $temperature; // KELVIN
+        $this->humidity = $humidity; // PASCALS
+        $this->pressure = $pressure; // PASCALS
         $this->vehicleSpeed = $vehicleSpeed;
         $this->vehicleCount = $vehicleCount;
     }
 
     public static function parseNode($assetDataArray) {
-        var_dump($assetDataArray);
         $asset = new Asset(
             $assetDataArray['parentAssetUid'],
             $assetDataArray['assetUid'],
@@ -47,11 +47,25 @@ class Asset {
         unset($asset);
         return $assetArray;
     }
-    public static function parseNodeEnvironmentalData(&$node, $environmentalData){
-        $node->temperature = $environmentalData['content'][0]['measures']['mean'];
-        if($GLOBALS['debug']) {
-            var_dump($environmentalData);
+    public static function parseNodeEnvironmentalData(&$asset, $temperatureData, $humidityData, $pressureData){
+        $asset->temperature = $temperatureData['content'][0]['measures']['mean'];
+        $asset->humidity = $humidityData['content'][0]['measures']['mean'];
+        $asset->pressure = $pressureData['content'][0]['measures']['mean'];
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($temperatureData);
         }
-        return $node;
+        return $asset;
+    }
+    public static function parseNodeTrafficData(&$asset, $trafficData){
+        $asset->vehicleSpeed = $trafficData['content'][0]['measures']['speed'];
+        $asset->vehicleCount = $trafficData['content'][0]['measures']['vehicleCount'];
+
+        if($GLOBALS['debug'] >= DebugVerbosity::MEDIUM) {
+            var_dump($trafficData);
+        }
+        return $asset;
+    }
+    public static function parseNodeAwarenessData(&$asset, $temperatureData, $humidityData, $pressureData){
+        // TODO: Implement
     }
 }

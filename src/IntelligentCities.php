@@ -1,9 +1,10 @@
 <?php
+require_once './Model/DebugVerbosity.php';
 require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
 $client_token = "";
-$debug = false;
+$debug = DebugVerbosity::MINOR;
 
 class IntelligentCities {
     /** Constants **/
@@ -12,7 +13,6 @@ class IntelligentCities {
     const env_zone_id = "SDSIM-IE-ENVIRONMENTAL";
     const username = "hackathon";
     const password = "@hackathon"; // TODO: Move the username and password to a safer place.
-    const debug = false;
 
     /*
      *  MAIN function that given a latitude and a longitude returns an estimated delay in minutes on the time of arrival
@@ -20,9 +20,8 @@ class IntelligentCities {
      */
     public static function determineETADelay($latitude, $longitude) {
         $time = 1500328704000; // On a real environment we would use time() * 1000
-        IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
+        //IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
         //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
-
         $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
         return $ETAModifier;
     }
@@ -31,8 +30,8 @@ class IntelligentCities {
      * MAIN function that given a latitude and a longitude returns an Asset array which contains the environmental,
      * traffic and awareness information available on each node
      */
-    public static function gatherReportData($latitude, $longitude){
-
+    public static function gatherReportData($latitude, $longitude, $time = 1500328704000){
+        return IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
     }
 
     /** Function that renews the access token using the given username and password credentials for the nodes **/
@@ -46,35 +45,34 @@ class IntelligentCities {
         }
     }
 
-    /** Function that given the unique id of an asset, retrieves and returns the current registered temperature
-     * fetchNodeTemperature("ENV-ATL-0009-1", 1500328704000);
+    /** Function that given the unique id of an asset, retrieves and returns the current registered event data
+     * fetchAssetEvent("ENV-ATL-0009-1", 1500328704000);
      **/
-    private static function fetchNodeTemperature($asset_uid, $measurement_time) {
+    private static function fetchAssetEvent($assetUid, $eventType, $measurementTime) {
         IntelligentCities::validateToken();
 
         // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
         $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-        $event_type = "TEMPERATURE";
-        $start_time =   $measurement_time - $delta;
-        $end_time =     $measurement_time;
+        $start_time =   $measurementTime - $delta;
+        $end_time =     $measurementTime;
 
-        print "Retrieving " . $asset_uid . " environmental data...\n";
         $response = IntelligentCities::CallAPI("GET", IntelligentCities::eventURL
-            . "/assets/" . $asset_uid
-            . "/events?eventType=". $event_type
+            . "/assets/" . $assetUid
+            . "/events?eventType=". $eventType
             . "&startTime=" . $start_time . "&endTime=" . $end_time
         );
-        if($GLOBALS['debug']) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
         return $response;
     }
 
     /**
-     * Function that given a latitude and longitude retrieves and returns an array with the nearby nodes containing temperature and traffic data
+     * Function that given a latitude and longitude retrieves and returns an array with the nearby assets containing temperature and traffic data
+     * if the $includeAwarenessData parameter is set, it will also fetch the available media from the assets.
      * fetchNearbyNodesData(33.754226,-84.396138);
      **/
-    private static function fetchNearbyAssetsData($xCenter, $yCenter, $measurementTime){
+    private static function fetchNearbyAssetsData($xCenter, $yCenter, $measurementTime, $includeAwarenessData = false){
 
         // Get the nearby nodes to the given coordinates
         $nearbyAssetsResponse = IntelligentCities::fetchNearbyAssets($xCenter, $yCenter);
@@ -83,18 +81,36 @@ class IntelligentCities {
 
         // Retrieve additional node data
         foreach ($assetArray as $asset) {
+            // TODO: Do the networking calls on separate threads:
+            // Temperature
+            $assetTemperatureResponse = IntelligentCities::fetchAssetEvent($asset->envAssetUid,"TEMPERATURE", $measurementTime);
+            $assetTemperatureData = json_decode($assetTemperatureResponse, true);
+            // Humidity
+            $assetHumidityResponse = IntelligentCities::fetchAssetEvent($asset->envAssetUid,"HUMIDITY", $measurementTime);
+            $assetHumidityData = json_decode($assetHumidityResponse, true);
+            // Pressure
+            $assetPressureResponse = IntelligentCities::fetchAssetEvent($asset->envAssetUid,"PRESSURE", $measurementTime);
+            $assetPressureData = json_decode($assetPressureResponse, true);
+            Asset::parseNodeEnvironmentalData($asset, $assetTemperatureData, $assetHumidityData, $assetPressureData);
+            // Traffic
+            $assetTrafficResponse = IntelligentCities::fetchAssetEvent($asset->tfevtAssetUid,"TFEVT", $measurementTime);
+            $assetTrafficData = json_decode($assetTrafficResponse, true);
+            //var_dump($assetTrafficData);
+            Asset::parseNodeTrafficData($asset, $assetTrafficData);
 
-            $assetEnvironmentalResponse = IntelligentCities::fetchNodeTemperature($asset->assetUid, $measurementTime);
-            $assetEnvironmentalData = json_decode($assetEnvironmentalResponse, true);
-            Asset::parseNodeEnvironmentalData($asset, $assetEnvironmentalData);
+            if($includeAwarenessData) {
+                //TODO: Add node situational awareness data to the node object
+
+            }
+            //var_dump($asset);
         }
-        var_dump($assetArray);
+        //var_dump($assetArray);
         return $assetArray;
     }
 
     /**
-     * Function that given a latitude and longitude retrieves and returns an array with the nearby nodes
-     * fetchNearbyNodes(33.754226,-84.396138);
+     * Function that given a latitude and longitude retrieves and returns an array with the nearby assets
+     * fetchNearbyAssets(33.754226,-84.396138);
      **/
     private static function fetchNearbyAssets($xcenter, $ycenter){
         IntelligentCities::validateToken();
@@ -108,14 +124,14 @@ class IntelligentCities {
         $page = 0;
         $size = 10;
 
-        if($GLOBALS['debug']) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             print "Bounding box is: " . $bbox_x1 . ", " .$bbox_y1 . " : " . $bbox_x2 . ", " . $bbox_y2 . "\n";
         }
         $asset_type = "ENV_SENSOR";
         $event_type = "TEMPERATURE";
         $request_uri = "/assets/search?";
 
-        if($GLOBALS['debug']) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             print "Retrieving " . $xcenter . ", " . $ycenter . " nearby nodes...\n";
         }
 
@@ -127,7 +143,7 @@ class IntelligentCities {
             . "&q=assetType:" . $asset_type
             . "&eventType=". $event_type
         );
-        if($GLOBALS['debug']) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
 
@@ -151,7 +167,9 @@ class IntelligentCities {
     private static function CallAPI($method, $url, $data = false, $authenticated = true)
     {
         $curl = curl_init();
-        print $url . "\n";
+        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+            print $url . "\n";
+        }
         switch ($method)
         {
             case "POST":

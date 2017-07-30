@@ -6,13 +6,15 @@ runIntelligentCitiesIntegrationTests();
 
 function runIntelligentCitiesIntegrationTests() {
     testDetermineETADelay();
-    //testGatherReportData();
+    testGatherReportData();
 }
 
 function testDetermineETADelay() {
-    IntelligentCities::determineETADelay(33.754226,-84.396138);
+    $ETAModifier = IntelligentCities::determineETADelay(33.754226,-84.396138);
+    var_dump($ETAModifier);
 }
 
 function testGatherReportData() {
-    IntelligentCities::gatherReportData(33.754226,-84.396138);
+    $assets = IntelligentCities::gatherReportData(33.754226,-84.396138);
+    var_dump($assets);
 }
