@@ -21,7 +21,7 @@ a {
   color: inherit;
 }
 .main {
-  margin-top: 12px;
+  margin-top: 42px;
   width: 100%;
   background-image: url("../assets/paratransitpal1.jpg");
   background-repeat: no-repeat;
@@ -215,6 +215,7 @@ h2 {
   font-weight: bold;
   line-height: 1.6;
   width: 100%;
+  z-index: 100;
 }
 
 .menu-list {
@@ -237,6 +238,8 @@ h2 {
 
 .header {
   top: 0;
+  position: fixed;
+  width: 100%;
   z-index: 900;
   text-align: center;
   background: #dedede;

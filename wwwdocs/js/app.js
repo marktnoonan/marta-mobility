@@ -173,7 +173,6 @@ function pushHandlebars(handlebarsTemplate, destination) {
     }
     firstHandlebarsPush = false;
   }
-
 }
 
 function startReport(action) {
