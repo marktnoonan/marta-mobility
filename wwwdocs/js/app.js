@@ -182,9 +182,12 @@ function startReport(action) {
   return report;
 }
 
+// intending to keep this global for now.
+var report;
+
 function getHelp(action) {
   console.log("Help requested: " + action);
-  var report = startReport(action);
+  report = startReport(action);
   var actionSpecificText = "We have alerted your emergency contacts ";
 
   switch (action) {
@@ -227,7 +230,7 @@ function addListeners() {
 
   addCommentsButton.addEventListener("click", function() {
     var commentsField = document.querySelector("textarea[name=what-happened]");
-    addComments(commentsField.value);
+    report.addComments(commentsField.value);
     commentsField.value = "";
     document.querySelector(".make-report").classList.remove("show");
   })
