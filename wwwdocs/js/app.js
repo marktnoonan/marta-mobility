@@ -1,4 +1,3 @@
-
 var context = {
   userType: document.querySelector('select[name=user-type]').value
 }; // context object holds data accessible to handlebars
@@ -61,10 +60,9 @@ function handleMenu(request) {
   if (request === "logout") {
     location.reload();
   } else if (request === "reports") {
-    // load reports list
+    showMyReports();
   } else if (request === "information") {
     showMyInfo();
-
   }
 
 }
@@ -125,6 +123,30 @@ function addMartaDataToDom(xhrResponse) {
 
 }
 
+function showMyReports() {
+
+  for (var theReport in dbResults.reports) {
+    var reportTime = new Date(dbResults.reports[theReport].time);
+    var prettyTime = reportTime.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(reportTime.toTimeString().substr(0, 5)));
+    dbResults.reports[theReport]["prettyTime"] = prettyTime;
+  }
+
+  var myInfoTemplate = document.querySelector('#my-reports-template').innerHTML;
+  var myInfoOutput = document.querySelector('.my-info-output');
+  pushHandlebars(myInfoTemplate, myInfoOutput);
+  myInfoOutput.classList.add("show");
+
+  (function addMyInfoListeners() {
+    var closer = document.querySelector('.closer-for-my-reports');
+    closer.addEventListener("click", function() {
+      document.querySelector(".my-info-output").classList.remove("show");
+      document.querySelector(".menu-panel").classList.add("hidden");
+      showingMenu = false;
+    });
+  })();
+
+}
+
 function showMyInfo() {
   var myInfoTemplate = document.querySelector('#my-info-template').innerHTML;
   var myInfoOutput = document.querySelector('.my-info-output');
@@ -149,10 +171,7 @@ function showMyInfo() {
         turnEditing.offFor(this.parentElement);
       });
     }
-
-
   })();
-
 }
 
 var firstHandlebarsPush = true;
@@ -263,15 +282,15 @@ function addListeners() {
 
   bell = document.querySelector('.bell');
 
-// not using refresh button since we connected to firebase
+  // not using refresh button since we connected to firebase
 
-/*  document.querySelector('#refresh').addEventListener('click', function() {
-    var username = document.querySelector('input[name=providedUsername]').value;
-    var password = document.querySelector('input[name=providedPassword]').value;
+  /*  document.querySelector('#refresh').addEventListener('click', function() {
+      var username = document.querySelector('input[name=providedUsername]').value;
+      var password = document.querySelector('input[name=providedPassword]').value;
 
-    getTrips(username, password);
+      getTrips(username, password);
 
-  });*/
+    });*/
 
 }
 
@@ -360,6 +379,7 @@ var modifierRef = database.ref("eta-modifier");
 var emergencyContactsRef = database.ref("emergency-contacts");
 var myInfoRef = database.ref("info");
 var locationsRef = database.ref("saved-locations");
+var reportsRef = database.ref("reports");
 var dbResults = {};
 
 function listenToFirebase() {
@@ -391,10 +411,13 @@ function listenToFirebase() {
     dbResults["saved-locations"] = snapshot.val();
   });
 
+  reportsRef.on("value", function(snapshot) {
+    dbResults["reports"] = snapshot.val();
+  });
 
   context.dbResults = dbResults;
-
 }
+
 
 function combineDelays() {
   var theEtaInMinutes = convertTimeToMinutes(dbResults.etaFromMarta);
@@ -578,4 +601,4 @@ var turnEditing = {
 }
 
 // when all else is done...
-  document.querySelector(".form-wrapper").classList.add("show");
+document.querySelector(".form-wrapper").classList.add("show");

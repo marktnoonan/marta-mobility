@@ -60,6 +60,19 @@
       Here will be the information panel!
     </div>
 
+<script id="my-reports-template" type="text/x-handlebars-template">
+  <span class="closer-for-my-reports">×</span>
+<h1>My Reports</h1>
+  {{#each dbResults.reports}}
+  <div class="card">
+  <span class="info-label">Time</span>: {{prettyTime}} <br>
+  <span class="info-label">Report Category</span>: {{category}}<br>
+  <span class="info-label">Incident Location</span>: {{location.latitude}}, {{location.longitude}}<br>
+</div>
+{{/each}}
+  HEYHEYHEYHEYHEY
+</script>
+
 <script id="my-info-template" type="text/x-handlebars-template">
   <span class="closer-for-my-info">×</span>
 <h1>My Information</h1>

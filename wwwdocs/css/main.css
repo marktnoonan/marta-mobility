@@ -14,6 +14,7 @@ body {
   font-size: 14px;
   color: #444;
   background-color: #fff;
+  padding-top: 45px;
 }
 
 a {
@@ -21,7 +22,6 @@ a {
   color: inherit;
 }
 .main {
-  margin-top: 42px;
   width: 100%;
   background-image: url("../assets/paratransitpal1.jpg");
   background-repeat: no-repeat;
@@ -499,6 +499,7 @@ text+text {
   display: block;
     position: absolute;
     margin: 0;
+    margin-top: 45px;
     top: 0;
     left: 0;
     padding: 20px;
@@ -509,7 +510,7 @@ text+text {
     transition: opacity 600ms ease-in-out;
     min-height: 100vh;
     text-align: left;
-    z-index: 3;
+    z-index: 300;
     width: 100%;
 }
 
@@ -527,7 +528,7 @@ pointer-events: all;
 transition: opacity 600ms
 }
 
-.closer, .closer-for-my-info {
+.closer, .closer-for-my-info, .closer-for-my-reports {
     padding: 0;
     float: right;
     font-size: 2em;
@@ -555,7 +556,7 @@ transition: opacity 600ms
 
 .card {
   padding: 10px;
-  background-color: #ddd;
+  background-color: #d8d8d8;
   margin-bottom: 10px;
   line-height: 1.6;
   border-radius: 4px;
