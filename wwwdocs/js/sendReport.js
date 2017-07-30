@@ -1,6 +1,6 @@
 function Report(firebaseInstance, userId, category) {
 
-    var _reportLinkBase = window.location.hostname + "/report/";
+    var _reportLinkBase = window.location.hostname + "/mark/c3/wwwdocs/report/";
 
     var firebase = firebaseInstance;
     var userId = userId;

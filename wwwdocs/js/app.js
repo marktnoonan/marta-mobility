@@ -1,3 +1,4 @@
+
 var context = {
   userType: document.querySelector('select[name=user-type]').value
 }; // context object holds data accessible to handlebars
