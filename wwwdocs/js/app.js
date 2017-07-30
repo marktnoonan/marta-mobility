@@ -67,6 +67,27 @@ function handleMenu(request) {
 
 }
 
+
+function getNodeData(lat, long, resource) {
+
+  return new Promise(function(resolve, reject) {
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', "../src/IntelligentCities.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(console.log(xhr.responseText));
+      } else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
+  });
+
+}
+
+
 function getTrips(username, password) {
 
   /* let's not do the spinner for now

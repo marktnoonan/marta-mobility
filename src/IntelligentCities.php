@@ -5,10 +5,18 @@ require_once './Model/Asset.php';
 $client_token = "";
 $debug = false;
 
-/*
-
-*/
-
+if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'])){
+  $postedLat = $_POST['myLat'];
+  $postedLong = $_POST['myLong'];
+  $resource = $_POST['resource'];
+  if($resource === "eta"){
+        $myDelay = IntelligentCities::determineETADelay($postedLat, $postedLong);
+        echo $myDelay;
+  }else{
+      $myNodeData = IntelligentCities::gatherReportData($postedLat, $postedLong);
+      echo "node data";
+  }
+}
 
 
 class IntelligentCities {
@@ -25,8 +33,8 @@ class IntelligentCities {
      *  given its nearby nodes environmental and traffic information.
      */
     public static function determineETADelay($latitude, $longitude) {
-        $time = 1500328704000; // On a real environment we would use time() * 1000
-        // IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
+        //$time = 1500328704000; // On a real environment we would use time() * 1000
+        //IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
         //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
 
         $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
