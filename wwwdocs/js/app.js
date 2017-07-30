@@ -69,7 +69,10 @@ function handleMenu(request) {
 }
 
 function getTrips(username, password) {
-  document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>';
+
+  /* let's not do the spinner for now
+    
+  document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>'; */
 
   return new Promise(function(resolve, reject) {
 
@@ -111,8 +114,8 @@ function addMartaDataToDom(xhrResponse) {
 
   if (proceed) {
     pushHandlebars(mainHandlebarsTemplate, mainOutputDiv);
-    document.querySelector('#unpw-form').classList.add("hidden");
-    document.querySelector('#login').classList.add("hidden");
+    document.querySelector(".form-wrapper").classList.add("hidden");
+    document.querySelector(".header").classList.add("show");
     listenToFirebase();
   } else {
     document.querySelector('#output').innerHTML = '<br><br><Br><span style="color:#ff7e72">Client ID or password not found.</span>';
@@ -567,4 +570,8 @@ var turnEditing = {
     return textFields;
   }
 
+}
+
+window.onload = function(){
+  document.querySelector(".form-wrapper").classList.add("show");
 }
