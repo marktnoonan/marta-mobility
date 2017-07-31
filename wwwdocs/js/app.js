@@ -67,7 +67,6 @@ function handleMenu(request) {
 
 }
 
-
 function getNodeData(lat, long, resource) {
 
   return new Promise(function(resolve, reject) {
@@ -77,7 +76,7 @@ function getNodeData(lat, long, resource) {
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function() {
       if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(console.log(xhr.responseText));
+        resolve(context.nodeData = xhr.responseText);
       } else {
         reject(Error('Request failed, status was ' + xhr.statusText));
       }

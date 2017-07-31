@@ -68,8 +68,14 @@
   <span class="info-label">Date and Time of report</span>: {{prettyTime}} <br>
   <span class="info-label">Report Category</span>: {{category}}<br>
   <span class="info-label">Report Area</span>: Near {{prettyAddress}}<br>
-  <span class="info-label">Incident Comments</span>: {{comments}}<br>  
+  <span class="info-label">Incident Comments</span>: {{comments}}<br>
   <span class="info-label">Exact Location</span>: {{location.latitude}}, {{location.longitude}}<br>
+  <br>
+  <span class="info-label">Nearby Nodes</span>:
+
+  {{#each nodedata as |val key|}}
+    {{val.envAssetUid}}
+  {{/each}}
 </div>
 {{/each}}
 </script>
@@ -295,8 +301,8 @@ ETA: <span class="eta-from-db"></span>
     <span id="action-specific-text"></span>
     <form class="make-report-form">
       <b>Add to report:</b><br><br>
+      <center>
       <textarea name="what-happened"></textarea><br><br>
-      <center>Add Video - Add Audio - Add Photos<br><br>
         <button type="button" name="submit-report">Complete Report</button>
       </center>
     </form>

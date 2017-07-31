@@ -4,7 +4,7 @@ require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
 $client_token = null;
-$debug = DebugVerbosity::PRODUCTION;
+$debug = DebugVerbosity::MINOR;
 
 if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'])){
   $postedLat = $_POST['myLat'];
@@ -15,7 +15,7 @@ if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'
         echo $myDelay;
   }else{
       $myNodeData = IntelligentCities::gatherReportData($postedLat, $postedLong);
-      echo "node data";
+      echo json_encode($myNodeData);
   }
 }
 

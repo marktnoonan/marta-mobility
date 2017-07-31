@@ -8,6 +8,11 @@ html, body {
   box-sizing: inherit;
 }
 
+textarea {
+  width: 240px;
+  height: 150px;
+}
+
 body {
   font-family: soleil, Helvetica, Arial, sans-serif;
   text-align: center;
@@ -68,7 +73,7 @@ input, button, select {
   border: 1px solid rgba(100,100,100,0.5);
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 4px;
-  margin-top: 140px;
+  margin-top: 38%;
   padding: 10px;
   width: 250px;
   pointer-events: 0;
@@ -555,8 +560,10 @@ transition: opacity 600ms
 }
 
 .fetching-reports{
-  
+
 }
+
+
 
 .card {
   padding: 10px;
