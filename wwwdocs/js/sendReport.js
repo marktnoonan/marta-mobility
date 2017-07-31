@@ -45,6 +45,7 @@ function Report(firebaseInstance, userId, category) {
       });
       emails.push(personalEmail);
 
+
       firebase.database().ref('emergency-contacts').on("value", function (snapshot) {
         var contacts = snapshot.val();
         for (var contact in contacts) {
@@ -54,7 +55,16 @@ function Report(firebaseInstance, userId, category) {
         }
       });
 
-      console.log(emails);
+      emails.forEach(function(address){
+          sendEmail(address,"some report data");
+      });
+
+      function sendEmail(address, body){
+        console.log("I'm trying to send an email here");
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "../src/email/martatesto.php", true);
+        xhr.send("emailAddress=" + encodeURIComponent(address) + "&emailBody=" + encodeURIComponent(body));
+      }
 
     }
 
