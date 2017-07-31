@@ -173,7 +173,9 @@ class IntelligentCities {
                 $assetAwarenessData = json_decode($assetAwarenessResponse, true);
                 Asset::parseNodeAwarenessData($asset, $assetAwarenessData);
             }
-            var_dump($asset);
+            if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+                var_dump($asset);
+            }
         }
         return $assetArray;
     }
