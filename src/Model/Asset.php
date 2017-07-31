@@ -47,6 +47,10 @@ class Asset {
         unset($asset);
         return $assetArray;
     }
+
+    public static function parseNodeAssetDetails(&$asset, $nodeData) {
+        var_dump($nodeData);
+    }
     public static function parseNodeEnvironmentalData(&$asset, $temperatureData, $humidityData, $pressureData){
         $asset->temperature = $temperatureData['content'][0]['measures']['mean'];
         $asset->humidity = $humidityData['content'][0]['measures']['mean'];
@@ -59,7 +63,6 @@ class Asset {
     public static function parseNodeTrafficData(&$asset, $trafficData){
         $asset->vehicleSpeed = $trafficData['content'][0]['measures']['speed'];
         $asset->vehicleCount = $trafficData['content'][0]['measures']['vehicleCount'];
-
         if($GLOBALS['debug'] >= DebugVerbosity::MEDIUM) {
             var_dump($trafficData);
         }
