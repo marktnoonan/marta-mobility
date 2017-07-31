@@ -1,11 +1,18 @@
-var context = {
-  userType: document.querySelector('select[name=user-type]').value
-}; // context object holds data accessible to handlebars
+var context = {}; // context object holds data accessible to handlebars and application state.
+
+if (document.querySelector('select[name=user-type]')){
+  context["userType"] = document.querySelector('select[name=user-type]').value;
+}
+
+if ( document.querySelector('.menu-open')) {
+  addStartingListeners();
+}
+
 var firstBooking = null;
 var bell = null;
 var showingMenu = false;
 
-(function addStartingListeners() {
+function addStartingListeners() {
 
   document.querySelector('.menu-open').addEventListener('click', openMenu);
 
@@ -40,7 +47,7 @@ var showingMenu = false;
 
     }
   });
-})();
+}
 
 
 
@@ -642,4 +649,6 @@ var turnEditing = {
 }
 
 // when all else is done...
-document.querySelector(".form-wrapper").classList.add("show");
+if (document.querySelector(".form-wrapper")) {
+  document.querySelector(".form-wrapper").classList.add("show");
+}
