@@ -69,7 +69,7 @@ function Report(firebaseInstance, userId, category) {
     }
 
     addNodeData = function(lat, long, resource) {
-
+console.log("adding node data");
       return new Promise(function(resolve, reject) {
 
         var xhr = new XMLHttpRequest();
@@ -78,7 +78,7 @@ function Report(firebaseInstance, userId, category) {
         xhr.onload = function() {
           if (xhr.readyState == 4 && xhr.status === 200) {
             resolve(
-              firebase.database().ref('reports/' + reportId + '/nodedata').set(JSON.parse((xhr.responseText).substr(6302)))
+              firebase.database().ref('reports/' + reportId + '/nodedata').set(xhr.responseText)
             );} else {
             reject(Error('Request failed, status was ' + xhr.statusText));
           }
