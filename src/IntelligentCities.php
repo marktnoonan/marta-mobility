@@ -1,5 +1,6 @@
 <?php
 require_once './Model/DebugVerbosity.php';
+require_once './IA/DecisionTree.php';
 require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
@@ -20,9 +21,9 @@ class IntelligentCities {
      */
     public static function determineETADelay($latitude, $longitude) {
         $time = 1500328704000; // On a real environment we would use time() * 1000
-        //IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
-        //TODO: feed the retrieved information from the nearby nodes to the decision tree which will determine the estimated delay
-        $ETAModifier = Delay::LARGE; // TODO: Replace mock response with the decision tree classification result
+        $assets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
+        $ETAModifier = DecisionTree::classify($assets);
+        $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
         return $ETAModifier;
     }
 
@@ -31,7 +32,9 @@ class IntelligentCities {
      * traffic and awareness information available on each node
      */
     public static function gatherReportData($latitude, $longitude, $time = 1500328704000){
-        return IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
+        $nearbyAssets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
+        $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
+        return $nearbyAssets;
     }
 
     /** Function that renews the access token using the given username and password credentials for the nodes **/
@@ -46,20 +49,14 @@ class IntelligentCities {
     }
 
     /**
-     * Function that given the unique id of an parent asset, retrieves all the available sub assets on it
+     * Function that given the unique id of an node asset, retrieves all the available sub assets on it
      **/
-    private static function fetchNodeAssets($assetUid, $eventType, $measurementTime) {
+    private static function fetchNodeSubAssets($assetUid) {
         IntelligentCities::validateToken();
 
-        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-        $start_time =   $measurementTime - $delta;
-        $end_time =     $measurementTime;
-
-        $response = IntelligentCities::CallAPI("GET", IntelligentCities::eventURL
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::metadata_url
             . "/assets/" . $assetUid
-            . "/events?eventType=". $eventType
-            . "&startTime=" . $start_time . "&endTime=" . $end_time
+            . "/subAssets"
         );
         if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
@@ -114,6 +111,9 @@ class IntelligentCities {
             $assetPressureResponse = IntelligentCities::fetchAssetEvent($asset->envAssetUid,"PRESSURE", $measurementTime);
             $assetPressureData = json_decode($assetPressureResponse, true);
             Asset::parseNodeEnvironmentalData($asset, $assetTemperatureData, $assetHumidityData, $assetPressureData);
+            // Retrieve additional Node information
+            $nodeDetailsResponse = IntelligentCities::fetchNodeSubAssets($asset->parentAssetUid);
+            Asset::parseNodeAssetDetails($asset, $nodeDetailsResponse);
             // Traffic
             $assetTrafficResponse = IntelligentCities::fetchAssetEvent($asset->tfevtAssetUid,"TFEVT", $measurementTime);
             $assetTrafficData = json_decode($assetTrafficResponse, true);
@@ -154,7 +154,7 @@ class IntelligentCities {
         $request_uri = "/assets/search?";
 
         if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
-            print "Retrieving " . $xcenter . ", " . $ycenter . " nearby nodes...\n";
+            print "Retrieving " . $xcenter . ", " . $ycenter . " nearby assets...\n";
         }
 
         $response = IntelligentCities::CallAPI("GET", IntelligentCities::metadata_url
@@ -165,7 +165,7 @@ class IntelligentCities {
             . "&q=assetType:" . $asset_type
             . "&eventType=". $event_type
         );
-        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
             var_dump($response);
         }
 
