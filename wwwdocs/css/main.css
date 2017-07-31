@@ -20,6 +20,7 @@ body {
   color: #444;
   background-color: #fff;
   padding-top: 45px;
+  overflow-x: hidden;
 }
 
 a {
@@ -534,13 +535,15 @@ transition: opacity 600ms
 }
 
 .closer, .closer-for-my-info, .closer-for-my-reports {
-    padding: 0;
-    float: right;
-    font-size: 2em;
-    cursor: pointer;
-    transition: all 100ms ease-in;
-    color: #000;
-    transform: scale(1.1);
+  padding: 0;
+  font-size: 2em;
+  cursor: pointer;
+  transition: all 100ms ease-in;
+  color: #000;
+  transform: scale(1.1);
+  position: fixed;
+  right: 12px;
+  text-shadow: 0 0 5px #fff;
 }
 
 /* my info styles */
