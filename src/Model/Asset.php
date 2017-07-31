@@ -4,6 +4,7 @@ class Asset {
     public $parentAssetUid;
     public $envAssetUid;
     public $tfevtAssetUid;
+    public $mediaAssetUid;
     public $coordinates;
 
     // Environmental Planning Data
@@ -48,8 +49,19 @@ class Asset {
         return $assetArray;
     }
 
-    public static function parseNodeAssetDetails(&$asset, $nodeData) {
-        var_dump($nodeData);
+    public static function parseNodeAssetDetails(&$asset, $nodeData){
+        $assets = $nodeData['assets'];
+        foreach($assets as &$nodeAsset){
+            foreach($nodeAsset['eventTypes'] as &$nodeAssetEventType){
+                if($nodeAssetEventType == 'TFEVT' && !isset($asset->tfevtAssetUid)){
+                    $asset->tfevtAssetUid = $nodeAsset['assetUid'];
+                }
+            }
+            if ($nodeAsset['mediaType'] == 'IMAGE,VIDEO' && !isset($asset->mediaAssetUid)) {
+                $asset->mediaAssetUid = $nodeAsset['assetUid'];
+            }
+
+        }
     }
     public static function parseNodeEnvironmentalData(&$asset, $temperatureData, $humidityData, $pressureData){
         $asset->temperature = $temperatureData['content'][0]['measures']['mean'];
@@ -69,7 +81,11 @@ class Asset {
         return $asset;
     }
     public static function parseNodeAwarenessData(&$asset, $awarenessData){
-        // TODO: Implement and remove mock data
+        if($GLOBALS['debug'] >= DebugVerbosity::MEDIUM) {
+            var_dump($awarenessData);
+        }
+        // TODO: Debug and remove mock data
+        $media = $awarenessData['_embedded']['medias'][0]['url'];
         $asset->photoUrl = "https://ic-media-service.run.asv-pr.ice.predix.io/v2/mediastore/file/CAMERA-HYP1083-CAM-L_CAMERA-HYP1083-CAM-L_1459816592756_IMAGE.jpg";
     }
 }

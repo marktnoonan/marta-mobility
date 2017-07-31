@@ -25,7 +25,10 @@ class IntelligentCities {
     /** Constants **/
     const eventURL = "https://ic-event-service.run.aws-usw02-pr.ice.predix.io/v2";
     const metadata_url = "https://ic-metadata-service.run.aws-usw02-pr.ice.predix.io/v2/metadata";
+    const media_url = 'https://ic-media-service.run.aws-usw02-pr.ice.predix.io/v2/mediastore';
     const env_zone_id = "SDSIM-IE-ENVIRONMENTAL";
+    const traffic_zone_id= 'SDSIM-IE-TRAFFIC';
+    const ps_zone_id = 'SDSIM-IE-PUBLIC-SAFETY';
     const username = "hackathon";
     const password = "@hackathon"; // TODO: Move the username and password to a safer place.
 
@@ -34,7 +37,7 @@ class IntelligentCities {
      *  given its nearby nodes environmental and traffic information.
      */
     public static function determineETADelay($latitude, $longitude) {
-        //$time = 1500328704000; // On a real environment we would use time() * 1000
+        $time = 1500118662204; // On a real environment we would use time() * 1000// 1500118662204
         $assets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time);
         $ETAModifier = DecisionTree::classify($assets);
         $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
@@ -45,7 +48,7 @@ class IntelligentCities {
      * MAIN function that given a latitude and a longitude returns an Asset array which contains the environmental,
      * traffic and awareness information available on each node
      */
-    public static function gatherReportData($latitude, $longitude, $time = 1500328704000){
+    public static function gatherReportData($latitude, $longitude, $time = 1500118662204){
         $nearbyAssets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
         $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
         return $nearbyAssets;
@@ -80,6 +83,7 @@ class IntelligentCities {
 
     /** Function that given the unique id of an asset, retrieves and returns the current registered event data
      * fetchAssetEvent("ENV-ATL-0009-1", 1500328704000);
+     * fetchAssetEvent("CAM-ATL-0016-2", 1500118662204);
      **/
     private static function fetchAssetEvent($assetUid, $eventType, $measurementTime) {
         IntelligentCities::validateToken();
@@ -89,11 +93,40 @@ class IntelligentCities {
         $start_time =   $measurementTime - $delta;
         $end_time =     $measurementTime;
 
+        if($eventType == 'TFEVT') {
+            $predixId = IntelligentCities::traffic_zone_id;
+        } else {
+            $predixId = IntelligentCities::env_zone_id;
+        }
+
         $response = IntelligentCities::CallAPI("GET", IntelligentCities::eventURL
             . "/assets/" . $assetUid
             . "/events?eventType=". $eventType
             . "&startTime=" . $start_time . "&endTime=" . $end_time
-        );
+        , false, true, $predixId);
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($response);
+        }
+        return $response;
+    }
+
+    /**
+     * Function that given the unique id of an asset, the media type and a measurement time, retrieves and returns a media url
+     **/
+    private static function fetchAssetMedia($assetUid, $mediaType, $measurementTime) {
+        IntelligentCities::validateToken();
+
+        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
+        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
+        $start_time =   $measurementTime - $delta;
+        $end_time =     $measurementTime;
+        $predixId = IntelligentCities::ps_zone_id;
+
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
+            . "/assets/" . $assetUid
+            . "/media?media-types=". $mediaType
+            . "&start-ts" . $start_time . "&end-ts=" . $end_time
+            , false, true, $predixId);
         if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
@@ -127,20 +160,21 @@ class IntelligentCities {
             Asset::parseNodeEnvironmentalData($asset, $assetTemperatureData, $assetHumidityData, $assetPressureData);
             // Retrieve additional Node information
             $nodeDetailsResponse = IntelligentCities::fetchNodeSubAssets($asset->parentAssetUid);
-            Asset::parseNodeAssetDetails($asset, $nodeDetailsResponse);
+            $nodeDetailsData = json_decode($nodeDetailsResponse, true);
+            Asset::parseNodeAssetDetails($asset, $nodeDetailsData);
             // Traffic
             $assetTrafficResponse = IntelligentCities::fetchAssetEvent($asset->tfevtAssetUid,"TFEVT", $measurementTime);
             $assetTrafficData = json_decode($assetTrafficResponse, true);
-            //var_dump($assetTrafficData);
             Asset::parseNodeTrafficData($asset, $assetTrafficData);
 
             if($includeAwarenessData) {
-                //TODO: Add node situational awareness data to the node object
-
+                // Awareness
+                $assetAwarenessResponse = IntelligentCities::fetchAssetMedia($asset->mediaAssetUid,"IMAGE", $measurementTime);
+                $assetAwarenessData = json_decode($assetAwarenessResponse, true);
+                Asset::parseNodeAwarenessData($asset, $assetAwarenessData);
             }
-            //var_dump($asset);
+            var_dump($asset);
         }
-        //var_dump($assetArray);
         return $assetArray;
     }
 
@@ -179,7 +213,7 @@ class IntelligentCities {
             . "&q=assetType:" . $asset_type
             . "&eventType=". $event_type
         );
-        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
 
@@ -202,7 +236,7 @@ class IntelligentCities {
      * Data: array("param" => "value") ==> index.php?param=value
      * Method: POST, PUT, GET
      **/
-    private static function CallAPI($method, $url, $data = false, $authenticated = true)
+    private static function CallAPI($method, $url, $data = false, $authenticated = true, $predixId = IntelligentCities::env_zone_id)
     {
         $curl = curl_init();
         if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
@@ -228,7 +262,7 @@ class IntelligentCities {
         if($authenticated){
             $headers = [
                 "Authorization:Bearer ".$GLOBALS["client_token"]->{'access_token'},
-                "Predix-Zone-id:". IntelligentCities::env_zone_id
+                "Predix-Zone-id:". $predixId
             ];
             curl_setopt($curl, CURLOPT_HTTPHEADER,$headers);
         } else {

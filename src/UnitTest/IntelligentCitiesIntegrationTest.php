@@ -5,7 +5,7 @@ require_once 'IntelligentCities.php';
 runIntelligentCitiesIntegrationTests();
 
 function runIntelligentCitiesIntegrationTests() {
-    testDetermineETADelay();
+    //testDetermineETADelay();
     testGatherReportData();
 }
 
