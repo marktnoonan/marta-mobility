@@ -9,6 +9,7 @@ function ReportDisplay(firebaseInstance, reportId) {
 
        var updateData = function(data) {
             this.reportData = data.val();
+            this.reportData.prettyTime = makeTimePretty(new Date(this.reportData.time));
             updateHandlebars();
             console.log(data.val());
        };

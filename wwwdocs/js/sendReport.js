@@ -34,6 +34,38 @@ function Report(firebaseInstance, userId, category) {
 
     sendReport = function(reportId, reportData) {
         firebase.database().ref('reports/' + reportId).set(reportData);
+        getEmailAddresses();
+    }
+
+    getEmailAddresses = function(){
+      var emails = []
+      var personalEmail;
+      firebase.database().ref('info/email').on("value", function (snapshot) {
+        personalEmail = snapshot.val();
+      });
+      emails.push(personalEmail);
+
+
+      firebase.database().ref('emergency-contacts').on("value", function (snapshot) {
+        var contacts = snapshot.val();
+        for (var contact in contacts) {
+          if (contacts.hasOwnProperty(contact)) {
+          emails.push(contacts[contact].email);
+          }
+        }
+      });
+
+      emails.forEach(function(address){
+          sendEmail(address,"some report data");
+      });
+
+      function sendEmail(address, body){
+        console.log("I'm trying to send an email here");
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "../src/email/martatesto.php", true);
+        xhr.send("emailAddress=" + encodeURIComponent(address) + "&emailBody=" + encodeURIComponent(body));
+      }
+
     }
 
     addNodeData = function(lat, long, resource) {
