@@ -449,6 +449,9 @@ function listenToFirebase() {
     if (context.userType === "Passenger") {
       combineDelays();
     }
+    if (context.userType === "Dispatcher"){
+      pushHandlebars(document.querySelector("#dispatcher-template").innerHTML, document.querySelector('#output'));
+    }
 
   });
 
@@ -656,4 +659,12 @@ var turnEditing = {
 // when all else is done...
 if (document.querySelector(".form-wrapper")) {
   document.querySelector(".form-wrapper").classList.add("show");
+}
+
+function changeETA(newETA){
+
+if (newETA.length === 5) {
+    etaRef.set(newETA);
+}
+
 }
