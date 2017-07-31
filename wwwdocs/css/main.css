@@ -4,6 +4,7 @@ html, body {
   min-height: 100vh;
   box-sizing: border-box;
 }
+
 *, *:before, *:after {
   box-sizing: inherit;
 }
@@ -27,6 +28,7 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
 .main {
   width: 100%;
   background-image: url("../assets/paratransitpal1.jpg");
@@ -71,7 +73,7 @@ input, button, select {
 
 .form-wrapper {
   display: inline-block;
-  border: 1px solid rgba(100,100,100,0.5);
+  border: 1px solid rgba(100, 100, 100, 0.5);
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 4px;
   margin-top: 38%;
@@ -199,7 +201,7 @@ h2 {
   font-size: 1.6em;
 }
 
-.logo-img{
+.logo-img {
   position: absolute;
   top: 40px;
   margin: auto;
@@ -230,7 +232,7 @@ h2 {
   padding-left: 0;
 }
 
-.menu-list > li {
+.menu-list>li {
   border: 1px solid #444;
   background-color: #fff;
   margin-bottom: 8px;
@@ -240,7 +242,6 @@ h2 {
   cursor: pointer;
   border-radius: 4px;
 }
-
 
 .header {
   top: 0;
@@ -433,9 +434,12 @@ text+text {
   text-align: center;
 }
 
+
 /* end guage styles */
 
+
 /* bottom menu styles */
+
 .bottom-show-menu-link {
   color: #111;
   font-size: 1.5em;
@@ -451,7 +455,7 @@ text+text {
   cursor: pointer;
 }
 
-.bottom-menu{
+.bottom-menu {
   color: #000;
   padding-top: 10px;
   position: fixed;
@@ -477,11 +481,11 @@ text+text {
   padding: 16px 5px;
   border-radius: 4px;
   background-color: #fff;
-  background-image: linear-gradient(to bottom,rgba(0,0,0,0),#C9D9F1);
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), #C9D9F1);
   cursor: pointer;
 }
 
-.bottom-menu-item:hover, .emergency:hover, .menu-list > li:hover {
+.bottom-menu-item:hover, .emergency:hover, .menu-list>li:hover {
   background-color: #dff0d8;
 }
 
@@ -493,31 +497,33 @@ text+text {
   margin: auto;
   background-color: #fff;
   border-radius: 4px;
-  background-image: linear-gradient(to bottom,rgba(0,0,0,0),#C9D9F1);
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), #C9D9F1);
   cursor: pointer;
 }
 
+
 /* end bottom menu styles */
+
 
 /* report and dropdown styles */
 
 .make-report, .my-info-output {
   display: block;
-    position: absolute;
-    margin: 0;
-    margin-top: 45px;
-    top: 0;
-    left: 0;
-    padding: 20px;
-    background-color: #52A7B4;
-    color: #111;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 600ms ease-in-out;
-    min-height: 100vh;
-    text-align: left;
-    z-index: 300;
-    width: 100%;
+  position: absolute;
+  margin: 0;
+  margin-top: 45px;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  background-color: #52A7B4;
+  color: #111;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease-in-out;
+  min-height: 100vh;
+  text-align: left;
+  z-index: 300;
+  width: 100%;
 }
 
 .make-report-form {
@@ -529,9 +535,9 @@ text+text {
 }
 
 .show {
-opacity: 1;
-pointer-events: all;
-transition: opacity 600ms
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 600ms
 }
 
 .closer, .closer-for-my-info, .closer-for-my-reports {
@@ -544,10 +550,14 @@ transition: opacity 600ms
   position: fixed;
   right: 12px;
   text-shadow: 0 0 5px #fff;
+  background: inherit;
+  padding-left: 6px;
+  padding-bottom: 6px;
+  border-radius: 30% / 60%;
 }
 
-/* my info styles */
 
+/* my info styles */
 
 .edit, .done-editing {
   float: right;
@@ -562,11 +572,7 @@ transition: opacity 600ms
   color: #444;
 }
 
-.fetching-reports{
-
-}
-
-
+.fetching-reports {}
 
 .card {
   padding: 10px;
@@ -574,7 +580,7 @@ transition: opacity 600ms
   margin-bottom: 10px;
   line-height: 1.6;
   border-radius: 4px;
-  box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5)
+  box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.5)
 }
 
 .now-editing-card {
@@ -583,15 +589,19 @@ transition: opacity 600ms
 
 
 /*clearfix for cards*/
+
 .card:after {
-    content:"";
-    display:table;
-    clear:both;
+  content: "";
+  display: table;
+  clear: both;
 }
+
 
 /* end my info styles*/
 
+
 /* driver & dispatcher view styles */
+
 .driver-info {
   text-align: left;
 }
@@ -601,4 +611,6 @@ transition: opacity 600ms
   text-align: center;
   font-weight: bold;
 }
+
+
 /* end driver & dispatcher view styles */

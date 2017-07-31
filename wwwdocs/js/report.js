@@ -10,10 +10,11 @@ function ReportDisplay(firebaseInstance, reportId) {
        var updateData = function(data) {
             this.reportData = data.val();
             updateHandlebars();
+            console.log(data.val());
        };
        updateData = updateData.bind(this);
 
-       ref.on('value', updateData); 
+       ref.on('value', updateData);
    }
 
 }
