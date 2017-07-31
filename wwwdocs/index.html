@@ -65,17 +65,18 @@
 <h1>My Reports</h1>
   {{#each dbResults.reports}}
   <div class="card">
-  <span class="info-label">Date and Time of report</span>: {{prettyTime}} <br>
+  <span class="info-label">Date and Time of Report</span>: {{prettyTime}} <br>
   <span class="info-label">Report Category</span>: {{category}}<br>
   <span class="info-label">Report Area</span>: Near {{prettyAddress}}<br>
-  <span class="info-label">Incident Comments</span>: {{comments}}<br>
+  {{#if comments}}<span class="info-label">Incident Comments</span>: {{comments}}<br>{{/if}}
   <span class="info-label">Exact Location</span>: {{location.latitude}}, {{location.longitude}}<br>
   <br>
-  <span class="info-label">Nearby Nodes</span>:
+  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>:
 
   {{#each nodedata as |val key|}}
     {{val.envAssetUid}}
   {{/each}}
+  {{/if}}
 </div>
 {{/each}}
 </script>

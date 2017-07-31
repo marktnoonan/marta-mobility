@@ -150,6 +150,11 @@ function addMartaDataToDom(xhrResponse) {
 
 }
 
+
+function makeTimePretty(time){
+  return time.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(time.toTimeString().substr(0, 5)));
+}
+
 function showMyReports() {
 
 
@@ -158,7 +163,7 @@ function showMyReports() {
 
   for (var theReport in dbResults.reports) {
     var reportTime = new Date(dbResults.reports[theReport].time);
-    var prettyTime = reportTime.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(reportTime.toTimeString().substr(0, 5)));
+    var prettyTime = makeTimePretty(reportTime);
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
 
     var lat = dbResults.reports[theReport].location.latitude;
