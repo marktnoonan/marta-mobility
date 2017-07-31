@@ -178,17 +178,16 @@ Drop Off At: {{dropOffAddress}}<br>
   {{#with dataFromMarta.[0].bookings.[0]}}
 Date: {{date}}<br>
 Passenger Ready Time: {{displayReadyTime}}<br>
-Your ETA: {{displayEta}}<br>
+Stored ETA: {{displayEta}}<br>
 Pick Up At: {{pickupAddress}}<br>
 Drop Off At: {{dropOffAddress}}<br>
   {{/with}}
   <br>
 <h2>Trip info</h2>
 <br>
-{{#with dbResults}}
-ETA: <span class="eta-from-db"></span>
-{{/with}}
-(delays from db etc)
+<b>Live Marta ETA</b>: <input type="text" class="eta-from-db" value="{{dbResults.etaFromMarta}}" onchange="changeETA(this.value)"></input> <br>Edit as needed, please keep format HH:MM military time :)<br><br>
+<b>Paratransit Pal Delay Modifier</b>: <span class="modifier-from-db">{{dbResults.modifier}} minutes extra delay</span> <br><br>Modifier is calculated based on live node data and historical factors, if available. ETA shown to users is a combination of these two pieces of information.
+
 </div>
 
 </div>
