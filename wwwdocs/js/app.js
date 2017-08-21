@@ -442,6 +442,8 @@ function listenToFirebase() {
     if (dbResults.etaFromMarta && g1) {
       combineDelays();
     }
+    //getNewModifier("33.754226", "-84.396138", "eta");
+
   });
 
   etaRef.on("value", function(snapshot) {
@@ -474,6 +476,25 @@ function listenToFirebase() {
   context.dbResults = dbResults;
 }
 
+function getNewModifier(lat, long, resource) {
+console.log("adding node data");
+  return new Promise(function(resolve, reject) {
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', "../src/IntelligentCities.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(
+          modifierRef.set(xhr.responseText))} else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
+  });
+
+}
+
 
 function combineDelays() {
   var theEtaInMinutes = convertTimeToMinutes(dbResults.etaFromMarta);
@@ -481,10 +502,10 @@ function combineDelays() {
 
   var newDelay = 30 - (windowEndInMinutes - theEtaInMinutes);
   if (dbResults.modifier) {
-    newDelay += dbResults.modifier;
+    newDelay += parseInt(dbResults.modifier);
   }
   dbResults.combinedDelay = newDelay;
-  dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + dbResults.modifier);
+  dbResults.newETA = convertTimeFromMinutes(theEtaInMinutes + parseInt(dbResults.modifier));
 
   if (g1 && context.userType === "Passenger") {
     g1.refresh(newDelay + 30);
