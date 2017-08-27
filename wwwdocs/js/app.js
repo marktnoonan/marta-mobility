@@ -1,16 +1,64 @@
+
 var context = {}; // context object holds data accessible to handlebars and application state.
-
-if (document.querySelector('select[name=user-type]')){
-  context["userType"] = document.querySelector('select[name=user-type]').value;
-}
-
-if ( document.querySelector('.menu-open')) {
-  addStartingListeners();
-}
 
 var firstBooking = null;
 var bell = null;
 var showingMenu = false;
+
+var database = firebase.database();
+var etaRef = database.ref("eta-from-marta");
+var modifierRef = database.ref("eta-modifier");
+var emergencyContactsRef = database.ref("emergency-contacts");
+var myInfoRef = database.ref("info");
+var locationsRef = database.ref("saved-locations");
+var reportsRef = database.ref("reports");
+var dbResults = {};
+
+// intending to keep this global for now.
+var report;
+
+var g1; // global for development
+
+function paraRequest(url, method, params, headers) {
+  headers = headers || {};
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    for(var head in headers) {
+      xhr.setRequestHeader(head, headers[head]);
+    }
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(xhr.responseText);
+      } else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send(params);
+  });
+}
+
+function makeTimePretty(time){
+  return time.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(time.toTimeString().substr(0, 5)));
+}
+
+function convertTimeToMinutes(time) {
+  var timeInMinutes = time.split(":");
+  timeInMinutes = (timeInMinutes[0] * 60) + parseInt(timeInMinutes[1]);
+  return timeInMinutes;
+}
+
+function convertTimeFromMinutes(minutes) {
+  var minuteSegment = minutes % 60;
+  //adding the leading zero if needed.
+  minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
+  var hourSegment = (minutes - minuteSegment) / 60;
+  var amPm = hourSegment < 12 ? "AM" : "PM";
+  // converting from Military time if needed.
+  var convertedHour = hourSegment % 12;
+
+  return convertedHour + ":" + minuteSegment + " " + amPm;
+}
 
 function addStartingListeners() {
 
@@ -49,9 +97,6 @@ function addStartingListeners() {
   });
 }
 
-
-
-
 function openMenu() {
   if (!showingMenu) {
     showingMenu = true;
@@ -75,46 +120,19 @@ function handleMenu(request) {
 }
 
 function getNodeData(lat, long, resource) {
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "../src/IntelligentCities.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(context.nodeData = xhr.responseText);
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
+  var nodeReq = paraRequest("../src/IntelligentCities.php", 'POST', "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'content-type': 'application/x-www-form-urlencoded'});
+  nodeReq.then(function(nodeData) {
+    context.nodeData = nodeData;
   });
-
+  return nodeReq;
 }
 
-
 function getTrips(username, password) {
-
-  /* let's not do the spinner for now
-
-  document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>'; */
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "./api/index.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(addMartaDataToDom(xhr.responseText));
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send("providedUsername=" + username + "&providedPassword=" + password);
+  var tripReq = paraRequest("./api/index.php", 'POST', "providedUsername=" + username + "&providedPassword=" + password, {'content-type': 'application/x-www-form-urlencoded'});
+  tripReq.then(function(dat) {
+    addMartaDataToDom(dat);
   });
-
+  return tripReq;
 }
 
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
@@ -150,17 +168,9 @@ function addMartaDataToDom(xhrResponse) {
 
 }
 
-
-function makeTimePretty(time){
-  return time.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(time.toTimeString().substr(0, 5)));
-}
-
 function showMyReports() {
-
-
-    var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
-    var myInfoOutput = document.querySelector('.my-info-output');
-
+  var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
+  var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = makeTimePretty(reportTime);
@@ -168,26 +178,11 @@ function showMyReports() {
 
     var lat = dbResults.reports[theReport].location.latitude;
     var long = dbResults.reports[theReport].location.longitude;
-    reverseGeocode(lat,long);
+    if (typeof(dbResults.reports[theReport].prettyAddress) == 'undefined' || dbResults.reports[theReport].prettyAddress == '') {
+      reverseGeocode(lat,long, theReport).then(function() {pushHandlebars(myReportTemplate, myInfoOutput)});
+    }
   }
 
-function reverseGeocode(lat, long){
-  var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET",url,false);
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(dbResults.reports[theReport]["prettyAddress"] = JSON.parse(xhr.responseText).results[0].formatted);
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send(null);
-  });
-}
   pushHandlebars(myReportTemplate, myInfoOutput);
   myInfoOutput.classList.add("show");
 
@@ -199,6 +194,15 @@ function reverseGeocode(lat, long){
       showingMenu = false;
     });
   })();
+}
+
+function reverseGeocode(lat, long, reportIdx){
+  var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
+  var geoReq = paraRequest(url, "GET", null);
+  geoReq.then(function(geoData) {
+    dbResults.reports[reportIdx]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
+  });
+  return geoReq;
 }
 
 function showMyInfo() {
@@ -253,9 +257,6 @@ function startReport(action) {
   report.generateReport();
   return report;
 }
-
-// intending to keep this global for now.
-var report;
 
 function getHelp(action) {
   console.log("Help requested: " + action);
@@ -408,33 +409,6 @@ function completeStep(trackerElement, requiredText) {
   }
 }
 
-function convertTimeToMinutes(time) {
-  var timeInMinutes = time.split(":");
-  timeInMinutes = (timeInMinutes[0] * 60) + parseInt(timeInMinutes[1]);
-  return timeInMinutes;
-}
-
-function convertTimeFromMinutes(minutes) {
-  var minuteSegment = minutes % 60;
-  //adding the leading zero if needed.
-  minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
-  var hourSegment = (minutes - minuteSegment) / 60;
-  var amPm = hourSegment < 12 ? "AM" : "PM";
-  // converting from Military time if needed.
-  var convertedHour = hourSegment % 12;
-
-  return convertedHour + ":" + minuteSegment + " " + amPm;
-}
-
-var database = firebase.database();
-var etaRef = database.ref("eta-from-marta");
-var modifierRef = database.ref("eta-modifier");
-var emergencyContactsRef = database.ref("emergency-contacts");
-var myInfoRef = database.ref("info");
-var locationsRef = database.ref("saved-locations");
-var reportsRef = database.ref("reports");
-var dbResults = {};
-
 function listenToFirebase() {
 
   modifierRef.on("value", function(snapshot) {
@@ -522,8 +496,13 @@ function combineDelays() {
     " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);
 }
 
-// guage script!
-var g1; // global for development
+function changeETA(newETA){
+  if (newETA.length === 5) {
+    etaRef.set(newETA);
+  }
+}
+
+// gauge script!
 
 function gaugeSetup(time) {
 
@@ -677,15 +656,15 @@ var turnEditing = {
 
 }
 
+if (document.querySelector('select[name=user-type]')){
+  context["userType"] = document.querySelector('select[name=user-type]').value;
+}
+
+if ( document.querySelector('.menu-open')) {
+  addStartingListeners();
+}
+
 // when all else is done...
 if (document.querySelector(".form-wrapper")) {
   document.querySelector(".form-wrapper").classList.add("show");
-}
-
-function changeETA(newETA){
-
-if (newETA.length === 5) {
-    etaRef.set(newETA);
-}
-
 }
