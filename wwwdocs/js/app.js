@@ -50,12 +50,13 @@ function convertTimeToMinutes(time) {
 
 function convertTimeFromMinutes(minutes) {
   var minuteSegment = minutes % 60;
-  //adding the leading zero if needed.
+  //adding the leading zero to minute if needed.
   minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
   var hourSegment = (minutes - minuteSegment) / 60;
   var amPm = hourSegment < 12 ? "AM" : "PM";
   // converting from Military time if needed.
-  var convertedHour = hourSegment % 12;
+  var convertedHour = hourSegment === 12 ? hourSegment : hourSegment % 12;
+  // adding leading zero to hour if hour is 0.
   convertedHour = convertedHour === 0 ? "0" + convertedHour : convertedHour;
   return convertedHour + ":" + minuteSegment + " " + amPm;
 }
@@ -119,10 +120,11 @@ function handleMenu(request) {
 
 }
 
+// this function doesn't seem to get called?
 function getNodeData(lat, long, resource) {
   var nodeReq = paraRequest("../src/IntelligentCities.php", 'POST', "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'content-type': 'application/x-www-form-urlencoded'});
   nodeReq.then(function(nodeData) {
-    context.nodeData = JSON.parse(nodeData);
+    context.nodeData = nodeData;
   });
   return nodeReq;
 }
@@ -173,7 +175,9 @@ function showMyReports() {
   var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
 
-    dbResults.reports[theReport].nodedata = JSON.parse(dbResults.reports[theReport].nodedata);
+    if (dbResults.reports[theReport].nodedata){
+      dbResults.reports[theReport].nodedata = JSON.parse(dbResults.reports[theReport].nodedata);
+    }
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = makeTimePretty(reportTime);
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
