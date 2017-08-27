@@ -175,7 +175,7 @@ function showMyReports() {
   var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
 
-    if (dbResults.reports[theReport].nodedata){
+    if (typeof dbResults.reports[theReport].nodedata === 'string'){
       dbResults.reports[theReport].nodedata = JSON.parse(dbResults.reports[theReport].nodedata);
     }
     var reportTime = new Date(dbResults.reports[theReport].time);
