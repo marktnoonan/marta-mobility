@@ -1,3 +1,24 @@
+
+var context = {}; // context object holds data accessible to handlebars and application state.
+
+var firstBooking = null;
+var bell = null;
+var showingMenu = false;
+
+var database = firebase.database();
+var etaRef = database.ref("eta-from-marta");
+var modifierRef = database.ref("eta-modifier");
+var emergencyContactsRef = database.ref("emergency-contacts");
+var myInfoRef = database.ref("info");
+var locationsRef = database.ref("saved-locations");
+var reportsRef = database.ref("reports");
+var dbResults = {};
+
+// intending to keep this global for now.
+var report;
+
+var g1; // global for development
+
 function paraRequest(url, method, params, headers) {
   headers = headers || {};
   return new Promise(function(resolve, reject) {
@@ -17,19 +38,27 @@ function paraRequest(url, method, params, headers) {
   });
 }
 
-var context = {}; // context object holds data accessible to handlebars and application state.
-
-if (document.querySelector('select[name=user-type]')){
-  context["userType"] = document.querySelector('select[name=user-type]').value;
+function makeTimePretty(time){
+  return time.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(time.toTimeString().substr(0, 5)));
 }
 
-if ( document.querySelector('.menu-open')) {
-  addStartingListeners();
+function convertTimeToMinutes(time) {
+  var timeInMinutes = time.split(":");
+  timeInMinutes = (timeInMinutes[0] * 60) + parseInt(timeInMinutes[1]);
+  return timeInMinutes;
 }
 
-var firstBooking = null;
-var bell = null;
-var showingMenu = false;
+function convertTimeFromMinutes(minutes) {
+  var minuteSegment = minutes % 60;
+  //adding the leading zero if needed.
+  minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
+  var hourSegment = (minutes - minuteSegment) / 60;
+  var amPm = hourSegment < 12 ? "AM" : "PM";
+  // converting from Military time if needed.
+  var convertedHour = hourSegment % 12;
+
+  return convertedHour + ":" + minuteSegment + " " + amPm;
+}
 
 function addStartingListeners() {
 
@@ -139,17 +168,9 @@ function addMartaDataToDom(xhrResponse) {
 
 }
 
-
-function makeTimePretty(time){
-  return time.toDateString() + ", " + convertTimeFromMinutes(convertTimeToMinutes(time.toTimeString().substr(0, 5)));
-}
-
 function showMyReports() {
-
-
-    var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
-    var myInfoOutput = document.querySelector('.my-info-output');
-
+  var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
+  var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = makeTimePretty(reportTime);
@@ -159,15 +180,6 @@ function showMyReports() {
     var long = dbResults.reports[theReport].location.longitude;
     reverseGeocode(lat,long);
   }
-
-function reverseGeocode(lat, long){
-  var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
-  var geoReq = paraRequest(url, "GET", null);
-  geoReq.then(function(geoData) {
-    dbResults.reports[theReport]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
-  });
-  return geoReq;
-}
 
   pushHandlebars(myReportTemplate, myInfoOutput);
   myInfoOutput.classList.add("show");
@@ -180,6 +192,15 @@ function reverseGeocode(lat, long){
       showingMenu = false;
     });
   })();
+}
+
+function reverseGeocode(lat, long){
+  var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
+  var geoReq = paraRequest(url, "GET", null);
+  geoReq.then(function(geoData) {
+    dbResults.reports[theReport]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
+  });
+  return geoReq;
 }
 
 function showMyInfo() {
@@ -234,9 +255,6 @@ function startReport(action) {
   report.generateReport();
   return report;
 }
-
-// intending to keep this global for now.
-var report;
 
 function getHelp(action) {
   console.log("Help requested: " + action);
@@ -389,33 +407,6 @@ function completeStep(trackerElement, requiredText) {
   }
 }
 
-function convertTimeToMinutes(time) {
-  var timeInMinutes = time.split(":");
-  timeInMinutes = (timeInMinutes[0] * 60) + parseInt(timeInMinutes[1]);
-  return timeInMinutes;
-}
-
-function convertTimeFromMinutes(minutes) {
-  var minuteSegment = minutes % 60;
-  //adding the leading zero if needed.
-  minuteSegment = minuteSegment < 10 ? "0" + minuteSegment : minuteSegment;
-  var hourSegment = (minutes - minuteSegment) / 60;
-  var amPm = hourSegment < 12 ? "AM" : "PM";
-  // converting from Military time if needed.
-  var convertedHour = hourSegment % 12;
-
-  return convertedHour + ":" + minuteSegment + " " + amPm;
-}
-
-var database = firebase.database();
-var etaRef = database.ref("eta-from-marta");
-var modifierRef = database.ref("eta-modifier");
-var emergencyContactsRef = database.ref("emergency-contacts");
-var myInfoRef = database.ref("info");
-var locationsRef = database.ref("saved-locations");
-var reportsRef = database.ref("reports");
-var dbResults = {};
-
 function listenToFirebase() {
 
   modifierRef.on("value", function(snapshot) {
@@ -455,7 +446,6 @@ function listenToFirebase() {
   context.dbResults = dbResults;
 }
 
-
 function combineDelays() {
   var theEtaInMinutes = convertTimeToMinutes(dbResults.etaFromMarta);
   var windowEndInMinutes = convertTimeToMinutes(firstBooking.endWindow);
@@ -482,8 +472,13 @@ function combineDelays() {
     " windowEndInMinutes: " + windowEndInMinutes + " newDelay:" + newDelay);
 }
 
-// guage script!
-var g1; // global for development
+function changeETA(newETA){
+  if (newETA.length === 5) {
+    etaRef.set(newETA);
+  }
+}
+
+// gauge script!
 
 function gaugeSetup(time) {
 
@@ -637,15 +632,15 @@ var turnEditing = {
 
 }
 
+if (document.querySelector('select[name=user-type]')){
+  context["userType"] = document.querySelector('select[name=user-type]').value;
+}
+
+if ( document.querySelector('.menu-open')) {
+  addStartingListeners();
+}
+
 // when all else is done...
 if (document.querySelector(".form-wrapper")) {
   document.querySelector(".form-wrapper").classList.add("show");
-}
-
-function changeETA(newETA){
-
-if (newETA.length === 5) {
-    etaRef.set(newETA);
-}
-
 }
