@@ -19,8 +19,16 @@ function Report(firebaseInstance, userId, category) {
                     reportData.location = {
                         'latitude': res.coords.latitude,
                         'longitude': res.coords.longitude
-                    }
-                    sendReport(reportId, reportData);
+                    };
+                    geocodeReq = reverseGeocode(res.coords.latitude, res.coords.longitude)
+                    .then(function(address) {
+                        reportData['prettyAddress'] = address;
+                        sendReport(reportId, reportData);
+                    })
+                    .catch(function(err) {
+                        sendReport(reportId, reportData);
+                    });
+                    
                     //hardcoding for demo since if user is not in the smart city bounding box
                     //they will not actually get any node data
                     addNodeData("33.754226", "-84.396138", "notETA");
@@ -69,23 +77,11 @@ function Report(firebaseInstance, userId, category) {
     }
 
     addNodeData = function(lat, long, resource) {
-console.log("adding node data");
-      return new Promise(function(resolve, reject) {
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', "../src/IntelligentCities.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-          if (xhr.readyState == 4 && xhr.status === 200) {
-            resolve(
-              firebase.database().ref('reports/' + reportId + '/nodedata').set(xhr.responseText)
-            );} else {
-            reject(Error('Request failed, status was ' + xhr.statusText));
-          }
-        };
-        xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
-      });
-
+        nodeReq = paraRequest("../src/IntelligentCities.php", "POST", "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'Content-Type': "application/x-www-form-urlencoded"});
+        nodeReq.then(function(nodeData) {
+            firebase.database().ref('reports/' + reportId + '/nodedata').set(nodeData);
+        });
+        return nodeReq;
     }
 
     this.addComments = function(comments) {
@@ -98,6 +94,16 @@ console.log("adding node data");
 
     function generateReportId() {
         return userId + '_' + Math.round((new Date()).getTime() / 1000);
+    }
+
+    reverseGeocode = function(lat, long) {
+        return new Promise(function(resolve, reject) {
+            var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
+            var geoReq = paraRequest(url, "GET", null);
+            geoReq.then(function(geoData) {
+                resolve(JSON.parse(geoData).results[0].formatted);
+            });
+        });
     }
 
 }
