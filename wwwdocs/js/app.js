@@ -548,16 +548,16 @@ function gaugeSetup(time) {
     noGradient: true,
     customSectors: {
       ranges: [{
-          color: "#C9E5BD",
+          color: "#86BAA1",
           lo: 0,
           hi: 30
         }, {
-          color: "#F8EFC0",
+          color: "#FFCF56",
           lo: 31,
           hi: 59,
         },
         {
-          color: "#ff3b30",
+          color: "#F24236",
           lo: 60,
           hi: 720,
         }

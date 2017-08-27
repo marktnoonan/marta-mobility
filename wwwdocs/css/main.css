@@ -44,7 +44,7 @@ a {
   background-color: #ffffff;
   margin-bottom: 20px;
   padding-bottom: 0;
-  border: 1px solid #ddd;
+  border: 1px solid #87AFB5;
   border-radius: 4px;
   line-height: 2;
 }
@@ -128,7 +128,7 @@ div.date-and-id {
   text-align: left;
   margin-bottom: 4px;
   background-color: #dedede;
-  background-image: linear-gradient(to bottom, #f5f5f5 0, #e8e8e8 100%);
+  background-image: linear-gradient(to bottom, #f5f5f5 0, #52A7B4 80%);
   padding: 2px 10px 2px 10px;
   border-bottom: 1px solid #ddd;
 }
@@ -337,7 +337,7 @@ h2 {
 
 .pizza-tracker>.complete {
   background-color: darkseagreen;
-  background-image: linear-gradient(to bottom, #dff0d8 0, #c8e5bc 100%);
+  background-image: linear-gradient(to bottom, #C3DDD0 0, #86BAA1 100%);
   box-shadow: 0 0 0px 1px #b2dba1;
   color: #000;
 }
@@ -366,11 +366,11 @@ h2 {
 
 .pizza-tracker>.working {
   background-color: #cec;
-  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+  background-image: linear-gradient(to bottom, #fcf8e3 0, #FFCF56 100%);
 }
 
 .pizza-tracker>.future-step {
-  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+  background-image: linear-gradient(to bottom, #fcf8e3 0, #FFCF56 100%);
 }
 
 .status-text {
@@ -491,7 +491,7 @@ text+text {
 
 .emergency {
   width: 85%;
-  border: 3px solid #ff3b30;
+  border: 3px solid #F24236;
   padding: 10px;
   font-size: 1.5em;
   margin: auto;
