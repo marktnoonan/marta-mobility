@@ -166,18 +166,22 @@ function addMartaDataToDom(xhrResponse) {
   } else {
     document.querySelector('#output').innerHTML = '<br><br><Br><span style="color:#ff7e72">Client ID or password not found.</span>';
   }
-
-
 }
 
 function showMyReports() {
   var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
   var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
+    var iconString = getReportIcon(dbResults.reports[theReport].category);
+    dbResults.reports[theReport].iconString = iconString;
 
     if (typeof dbResults.reports[theReport].nodedata === 'string'){
       dbResults.reports[theReport].nodedata = JSON.parse(dbResults.reports[theReport].nodedata);
+      if (dbResults.reports[theReport].nodedata[0].vehicleSpeed === "NaN"){
+        dbResults.reports[theReport].nodedata[0].vehicleSpeed = "0";
+      }
     }
+    
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = makeTimePretty(reportTime);
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
@@ -407,6 +411,31 @@ function checkDelay(windowEnd, eta) {
   } else {
     lateSatusField.textContent = ", arriving on time.";
   }
+}
+
+function getReportIcon(reportType) {
+
+  var iconBuffer = '<i class="';
+
+  switch (reportType) {
+    case "I am lost":
+      iconBuffer += "fa fa-map-marker"
+      break;
+    case "I need help":
+      iconBuffer += "fa fa-flag"
+      break;
+    case "Incident Report":
+      iconBuffer += "fa fa-info-circle"
+      break;
+    case "Crime Report":
+      iconBuffer += "fa fa-gavel"
+      break;
+    default:
+  }
+
+  iconBuffer += ' fa-2x" aria-hidden="true"></i>';
+  return iconBuffer;
+
 }
 
 function completeStep(trackerElement, requiredText) {

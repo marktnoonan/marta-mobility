@@ -65,17 +65,29 @@
 <h1>My Reports</h1>
   {{#each dbResults.reports}}
   <div class="card">
-  <span class="info-label">Date and Time of Report</span>: {{prettyTime}} <br>
-  <span class="info-label">Report Category</span>: {{category}}<br>
-  <span class="info-label">Report Area</span>: Near {{prettyAddress}}<br>
-  {{#if comments}}<span class="info-label">Incident Comments</span>: {{comments}}<br>{{/if}}
-  <span class="info-label">Exact Location</span>: {{location.latitude}}, {{location.longitude}}<br>
-
-  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>:
+  <div class="report-header"><span class="report-icon">{{{iconString}}}</span>
+    "<b>{{category}}</b>", report generated on
+    <br>
+    {{prettyTime}}
+  </div>
+  {{#if comments}}
+  <span class="info-label">Comments</span><div class="report-info">{{comments}}</div>
+  {{/if}}
+  <span class="info-label">Location</span><div class="report-info">Near {{prettyAddress}}<br>(exact location: {{location.latitude}}, {{location.longitude}})</div>
+  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>
+  <div class="report-info">
   {{#each nodedata as |val key|}}
     {{val.envAssetUid}}
   {{/each}}
+  </div>
+  <span class="info-label">Traffic Speed</span>
+  <div class="report-info">{{nodedata.[0].vehicleSpeed}} mph
+  </div>
+  <span class="info-label">Nearby Vehicles</span>
+  <div class="report-info">{{nodedata.[0].vehicleCount}}
+  </div>
   {{/if}}
+
 </div>
 {{/each}}
 </script>
@@ -139,6 +151,7 @@
 <script id="driver-template" type="text/x-handlebars-template">
 <div>
 <div class="driver-info">
+  <br> <h1>Driver View</h1>
   <h2>Your Next Pickup</h2>
   <br>
 Passenger: {{dataFromMarta.[0].clientName}}<br>
@@ -197,7 +210,7 @@ Drop Off At: {{dropOffAddress}}<br>
 
       <div class="client-info text-align-center">
         Hi <b>{{dataFromMarta.[0].clientName}}!</b>
-</span></div>
+</></div>
         <br>
       </div>
       {{#with dataFromMarta.[0].bookings.[0]}}
