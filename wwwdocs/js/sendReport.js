@@ -23,12 +23,13 @@ function Report(firebaseInstance, userId, category) {
                     geocodeReq = reverseGeocode(res.coords.latitude, res.coords.longitude)
                     .then(function(address) {
                         reportData['prettyAddress'] = address;
+                        console.log("setting address: " + address);
                         sendReport(reportId, reportData);
                     })
                     .catch(function(err) {
                         sendReport(reportId, reportData);
                     });
-                    
+
                     //hardcoding for demo since if user is not in the smart city bounding box
                     //they will not actually get any node data
                     addNodeData("33.754226", "-84.396138", "notETA");

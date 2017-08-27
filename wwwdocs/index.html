@@ -70,9 +70,8 @@
   <span class="info-label">Report Area</span>: Near {{prettyAddress}}<br>
   {{#if comments}}<span class="info-label">Incident Comments</span>: {{comments}}<br>{{/if}}
   <span class="info-label">Exact Location</span>: {{location.latitude}}, {{location.longitude}}<br>
-  <br>
-  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>:
 
+  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>:
   {{#each nodedata as |val key|}}
     {{val.envAssetUid}}
   {{/each}}

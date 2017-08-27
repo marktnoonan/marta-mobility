@@ -56,7 +56,7 @@ function convertTimeFromMinutes(minutes) {
   var amPm = hourSegment < 12 ? "AM" : "PM";
   // converting from Military time if needed.
   var convertedHour = hourSegment % 12;
-
+  convertedHour = convertedHour === 0 ? "0" + convertedHour : convertedHour;
   return convertedHour + ":" + minuteSegment + " " + amPm;
 }
 
@@ -122,7 +122,7 @@ function handleMenu(request) {
 function getNodeData(lat, long, resource) {
   var nodeReq = paraRequest("../src/IntelligentCities.php", 'POST', "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'content-type': 'application/x-www-form-urlencoded'});
   nodeReq.then(function(nodeData) {
-    context.nodeData = nodeData;
+    context.nodeData = JSON.parse(nodeData);
   });
   return nodeReq;
 }
@@ -172,6 +172,8 @@ function showMyReports() {
   var myReportTemplate = document.querySelector('#my-reports-template').innerHTML;
   var myInfoOutput = document.querySelector('.my-info-output');
   for (var theReport in dbResults.reports) {
+
+    dbResults.reports[theReport].nodedata = JSON.parse(dbResults.reports[theReport].nodedata);
     var reportTime = new Date(dbResults.reports[theReport].time);
     var prettyTime = makeTimePretty(reportTime);
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
@@ -192,7 +194,6 @@ function showMyReports() {
 
   function addReportCloserListener() {
     var closer = document.querySelector('.closer-for-my-reports');
-    console.log(closer);
     closer.addEventListener("click", function() {
       console.log("closing");
       document.querySelector(".my-info-output").classList.remove("show");
