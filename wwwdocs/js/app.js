@@ -178,7 +178,9 @@ function showMyReports() {
 
     var lat = dbResults.reports[theReport].location.latitude;
     var long = dbResults.reports[theReport].location.longitude;
-    reverseGeocode(lat,long);
+    if (typeof(dbResults.reports[theReport].prettyAddress) == 'undefined' || dbResults.reports[theReport].prettyAddress == '') {
+      reverseGeocode(lat,long, theReport).then(function() {pushHandlebars(myReportTemplate, myInfoOutput)});
+    }
   }
 
   pushHandlebars(myReportTemplate, myInfoOutput);
@@ -194,11 +196,11 @@ function showMyReports() {
   })();
 }
 
-function reverseGeocode(lat, long){
+function reverseGeocode(lat, long, reportIdx){
   var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
   var geoReq = paraRequest(url, "GET", null);
   geoReq.then(function(geoData) {
-    dbResults.reports[theReport]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
+    dbResults.reports[reportIdx]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
   });
   return geoReq;
 }
