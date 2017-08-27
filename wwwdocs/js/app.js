@@ -179,21 +179,27 @@ function showMyReports() {
     var lat = dbResults.reports[theReport].location.latitude;
     var long = dbResults.reports[theReport].location.longitude;
     if (typeof(dbResults.reports[theReport].prettyAddress) == 'undefined' || dbResults.reports[theReport].prettyAddress == '') {
-      reverseGeocode(lat,long, theReport).then(function() {pushHandlebars(myReportTemplate, myInfoOutput)});
+      reverseGeocode(lat,long, theReport).then(function() {
+        pushHandlebars(myReportTemplate, myInfoOutput);
+        addReportCloserListener();
+        });
     }
   }
 
   pushHandlebars(myReportTemplate, myInfoOutput);
   myInfoOutput.classList.add("show");
+  addReportCloserListener();
 
-  (function addMyInfoListeners() {
+  function addReportCloserListener() {
     var closer = document.querySelector('.closer-for-my-reports');
+    console.log(closer);
     closer.addEventListener("click", function() {
+      console.log("closing");
       document.querySelector(".my-info-output").classList.remove("show");
       document.querySelector(".menu-panel").classList.add("hidden");
       showingMenu = false;
     });
-  })();
+  }
 }
 
 function reverseGeocode(lat, long, reportIdx){
