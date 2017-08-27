@@ -1,4 +1,4 @@
-# MARTA Mobility App #
+# Paratransit Pal #
 
 ## Installation ##
 You'll need [bower](http://bower.io) and [composer](http://getcomposer.org)
