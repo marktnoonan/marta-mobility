@@ -69,23 +69,11 @@ function Report(firebaseInstance, userId, category) {
     }
 
     addNodeData = function(lat, long, resource) {
-console.log("adding node data");
-      return new Promise(function(resolve, reject) {
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', "../src/IntelligentCities.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-          if (xhr.readyState == 4 && xhr.status === 200) {
-            resolve(
-              firebase.database().ref('reports/' + reportId + '/nodedata').set(xhr.responseText)
-            );} else {
-            reject(Error('Request failed, status was ' + xhr.statusText));
-          }
-        };
-        xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
-      });
-
+        nodeReq = paraRequest("../src/IntelligentCities.php", "POST", "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'Content-Type': "application/x-www-form-urlencoded"});
+        nodeReq.then(function(nodeData) {
+            firebase.database().ref('reports/' + reportId + '/nodedata').set(nodeData);
+        });
+        return nodeReq;
     }
 
     this.addComments = function(comments) {

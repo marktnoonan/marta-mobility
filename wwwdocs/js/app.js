@@ -1,3 +1,22 @@
+function paraRequest(url, method, params, headers) {
+  headers = headers || {};
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    for(var head in headers) {
+      xhr.setRequestHeader(head, headers[head]);
+    }
+    xhr.onload = function() {
+      if (xhr.readyState == 4 && xhr.status === 200) {
+        resolve(xhr.responseText);
+      } else {
+        reject(Error('Request failed, status was ' + xhr.statusText));
+      }
+    };
+    xhr.send(params);
+  });
+}
+
 var context = {}; // context object holds data accessible to handlebars and application state.
 
 if (document.querySelector('select[name=user-type]')){
@@ -49,9 +68,6 @@ function addStartingListeners() {
   });
 }
 
-
-
-
 function openMenu() {
   if (!showingMenu) {
     showingMenu = true;
@@ -75,46 +91,19 @@ function handleMenu(request) {
 }
 
 function getNodeData(lat, long, resource) {
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "../src/IntelligentCities.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(context.nodeData = xhr.responseText);
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send("myLat=" + lat + "&myLong=" + long + "&resource=" + resource);
+  var nodeReq = paraRequest("../src/IntelligentCities.php", 'POST', "myLat=" + lat + "&myLong=" + long + "&resource=" + resource, {'content-type': 'application/x-www-form-urlencoded'});
+  nodeReq.then(function(nodeData) {
+    context.nodeData = nodeData;
   });
-
+  return nodeReq;
 }
 
-
 function getTrips(username, password) {
-
-  /* let's not do the spinner for now
-
-  document.querySelector('#output').innerHTML = '<center><div id="spinner"></div></center>'; */
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "./api/index.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(addMartaDataToDom(xhr.responseText));
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send("providedUsername=" + username + "&providedPassword=" + password);
+  var tripReq = paraRequest("./api/index.php", 'POST', "providedUsername=" + username + "&providedPassword=" + password, {'content-type': 'application/x-www-form-urlencoded'});
+  tripReq.then(function(dat) {
+    addMartaDataToDom(dat);
   });
-
+  return tripReq;
 }
 
 // this function starts listening to firebase after data has been retrieved from the MARTA site.
@@ -173,21 +162,13 @@ function showMyReports() {
 
 function reverseGeocode(lat, long){
   var url ="https://api.opencagedata.com/geocode/v1/json?q="+lat+"%2C"+long+"&pretty=1&no_annotations=1&key=2b9e7715faf44bf2bb2f60bbae2768ba";
-
-  return new Promise(function(resolve, reject) {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET",url,false);
-    xhr.onload = function() {
-      if (xhr.readyState == 4 && xhr.status === 200) {
-        resolve(dbResults.reports[theReport]["prettyAddress"] = JSON.parse(xhr.responseText).results[0].formatted);
-      } else {
-        reject(Error('Request failed, status was ' + xhr.statusText));
-      }
-    };
-    xhr.send(null);
+  var geoReq = paraRequest(url, "GET", null);
+  geoReq.then(function(geoData) {
+    dbResults.reports[theReport]["prettyAddress"] = JSON.parse(geoData).results[0].formatted;
   });
+  return geoReq;
 }
+
   pushHandlebars(myReportTemplate, myInfoOutput);
   myInfoOutput.classList.add("show");
 
