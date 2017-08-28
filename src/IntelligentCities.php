@@ -5,7 +5,7 @@ require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
 $client_token = null;
-$debug = DebugVerbosity::PRODUCTION;
+$debug = DebugVerbosity::MINOR;
 
 if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'])){
   $postedLat = $_POST['myLat'];
@@ -51,6 +51,10 @@ class IntelligentCities {
     public static function gatherReportData($latitude, $longitude, $time = 1500118662204){
         $nearbyAssets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
         $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
+
+        // Place the closest node at the first position:
+        IntelligentCities::sortNodes($latitude, $longitude, $nearbyAssets);
+
         return $nearbyAssets;
     }
 
@@ -127,7 +131,7 @@ class IntelligentCities {
             . "/media?media-types=". $mediaType
             . "&start-ts" . $start_time . "&end-ts=" . $end_time
             , false, true, $predixId);
-        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
             var_dump($response);
         }
         return $response;
@@ -178,6 +182,73 @@ class IntelligentCities {
             }
         }
         return $assetArray;
+    }
+
+
+
+    /**
+     * Function that given a latitude and a longitude of two GPS coordinates, will return the distance in meters between them
+     * @param $latitude1
+     * @param $longitude1
+     * @param $latitude2
+     * @param $longitude2
+     * @return float
+     */
+    public static function distanceBetweenCoordinates($latitude1, $longitude1, $latitude2, $longitude2) {
+        // Calculate distance between latitude / longitude points: http://www.movable-type.co.uk/scripts/latlong.html
+
+        // Mean radius of planet earth in meters:
+        $earthRadiusMeters = 6371000.0;
+        $x = deg2rad( $longitude1 - $longitude2 ) * cos( deg2rad( $latitude1 ) );
+        $y = deg2rad( $latitude1 - $latitude2 );
+        $distanceMeters = $earthRadiusMeters * sqrt( $x*$x + $y*$y );
+        return $distanceMeters;
+    }
+
+    /**
+     * Function that places at the beginning of the array the
+     * @param $userLatitude
+     * @param $userLongitude
+     * @param $nodeArray
+     */
+    private static function sortNodes($userLatitude, $userLongitude, &$nodeArray) {
+        // If the array is empty, do nothing:
+        if (empty($nodeArray)) {
+            return;
+        }
+
+        // Get the size of the array:
+        $nodeArraySize = sizeof($nodeArray);
+
+        // Get the closest node to the user:
+        $closestNodeIndex = 0;
+        $closestNodeDistance = IntelligentCities::distanceBetweenCoordinates(
+            $userLatitude,
+            $userLongitude,
+            $nodeArray[0].latitude,
+            $nodeArray[0].longitude
+        );
+
+        for ($currentNodeIndex = 0; $currentNodeIndex < $nodeArraySize; $currentNodeIndex++) {
+            $currentNode = $nodeArray[$currentNodeIndex];
+            $currentNodeDistance = IntelligentCities::distanceBetweenCoordinates(
+                $userLatitude,
+                $userLongitude,
+                $currentNode.latitude,
+                $currentNode.longitude
+            );
+
+            // If the current node is closer to the user than the closest known node:
+            if ($currentNodeDistance < $closestNodeDistance) {
+                $closestNodeIndex = $currentNodeIndex;
+                $closestNodeDistance = $currentNodeDistance;
+            }
+        }
+
+        // Switch the closest known node with the one at the first array position:
+        $tempNode = $nodeArray[0];
+        $nodeArray[0] = $nodeArray[$closestNodeIndex];
+        $nodeArray[$closestNodeIndex] = $tempNode;
     }
 
     /**
