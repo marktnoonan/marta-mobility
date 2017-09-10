@@ -157,12 +157,21 @@
 Passenger: {{dataFromMarta.[0].clientName}}<br>
   {{#with dataFromMarta.[0].bookings.[0]}}
 Date: {{date}}<br>
-Passenger Ready Time: {{displayReadyTime}}<br>
-Your ETA: {{displayEta}}<br>
-Pick Up At: {{pickupAddress}}<br>
-Drop Off At: {{dropOffAddress}}<br>
+  Pick Up At {{pickupAddress}}<br>
+  Drop Off At: {{dropOffAddress}}<br>
+  <hr>
+  <div class="driver-times">
+    <div class="driver-time">
+      <b>Ready Time</b><br>
+      {{displayReadyTime}}
+    </div>
+    <div class="driver-time">
+      <b>Pickup ETA</b><br>
+  {{displayEta}}
+    </div>
+    </div>
   {{/with}}
-  <br>
+  <hr>
 <h2>Add a Delay</h2>
 <div class="driver-delay-options">
   <div class="driver-delay-option" data-action="SMALL">

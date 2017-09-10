@@ -645,5 +645,18 @@ text+text {
   font-weight: bold;
 }
 
+.driver-times {
+margin-top: 10px;
+margin-bottom: 10px;
+text-align: center;
+}
+
+.driver-time {
+  display: inline-block;
+  width: 45%;
+  background-color: #c7b350;
+  padding: 5px 0px;
+}
+
 
 /* end driver & dispatcher view styles */
