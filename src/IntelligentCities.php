@@ -138,6 +138,29 @@ class IntelligentCities {
     }
 
     /**
+     * Function that given the unique id of an asset, the media type and a measurement time, retrieves and returns a media url
+     **/
+    private static function fetchAssetPollUrl($assetUid, $mediaType, $measurementTime) {
+        IntelligentCities::validateToken();
+
+        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
+        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
+        $start_time =   $measurementTime - $delta;
+        $end_time =     $measurementTime;
+        $predixId = IntelligentCities::ps_zone_id;
+
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
+            . "/assets/" . $assetUid
+            . "/media?media-types=". $mediaType
+            . "&start-ts" . $start_time . "&end-ts=" . $end_time
+            , false, true, $predixId);
+        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+            var_dump($response);
+        }
+        return $response;
+    }
+
+    /**
      * Function that given a latitude and longitude retrieves and returns an array with the nearby assets containing temperature and traffic data
      * if the $includeAwarenessData parameter is set, it will also fetch the available media from the assets.
      * fetchNearbyNodesData(33.754226,-84.396138);
