@@ -256,16 +256,14 @@ class IntelligentCities {
 
         // Get the size of the array:
         $nodeArraySize = sizeof($nodeArray);
-
-        var_dump($nodeArray[0]);
-
+        
         // Get the closest node to the user:
         $closestNodeIndex = 0;
         $closestNodeDistance = IntelligentCities::distanceBetweenCoordinates(
             $userLatitude,
             $userLongitude,
-            $nodeArray[0].latitude,
-            $nodeArray[0].longitude
+            $nodeArray[0]->latitude,
+            $nodeArray[0]->longitude
         );
 
         for ($currentNodeIndex = 0; $currentNodeIndex < $nodeArraySize; $currentNodeIndex++) {
@@ -273,8 +271,8 @@ class IntelligentCities {
             $currentNodeDistance = IntelligentCities::distanceBetweenCoordinates(
                 $userLatitude,
                 $userLongitude,
-                $currentNode.latitude,
-                $currentNode.longitude
+                $currentNode->latitude,
+                $currentNode->longitude
             );
 
             // If the current node is closer to the user than the closest known node:

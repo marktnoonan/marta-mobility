@@ -6,6 +6,8 @@ class Asset {
     public $tfevtAssetUid;
     public $mediaAssetUid;
     public $coordinates;
+    public $latitude;
+    public $longitude;
 
     // Environmental Planning Data
     public $temperature;
@@ -24,6 +26,9 @@ class Asset {
         $this->envAssetUid = $envAssetUid;
         $this->parentAssetUid = $parentAssetUid;
         $this->coordinates = $coordinates;
+        $coordinatesArray = explode(":", $coordinates   );
+        $this->latitude = $coordinatesArray[0];
+        $this->longitude = $coordinatesArray[1];
         $this->temperature = $temperature; // KELVIN
         $this->humidity = $humidity; // PASCALS
         $this->pressure = $pressure; // PASCALS
