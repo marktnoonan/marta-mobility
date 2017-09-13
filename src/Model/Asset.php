@@ -88,4 +88,19 @@ class Asset {
         $media = $awarenessData['_embedded']['medias'][0]['url'];
         $asset->photoUrl = "https://ic-media-service.run.asv-pr.ice.predix.io/v2/mediastore/file/CAMERA-HYP1083-CAM-L_CAMERA-HYP1083-CAM-L_1459816592756_IMAGE.jpg";
     }
+
+    public static function parseNodePollURL($pollData) {
+        var_dump($pollData);
+        return $pollData['pollUrl'];
+    }
+
+    public static function parseNodeMediaData($pollData) {
+        var_dump($pollData);
+        $pollEntries = $pollData['listOfEntries'];
+        if($pollEntries['size'] >= 1){
+            return $pollEntries['content'][0];
+        } else {
+            return "";
+        }
+    }
 }

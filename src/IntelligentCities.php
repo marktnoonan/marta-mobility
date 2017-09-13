@@ -5,7 +5,7 @@ require_once './Model/Delay.php';
 require_once './Model/Asset.php';
 
 $client_token = null;
-$debug = DebugVerbosity::MINOR;
+$debug = DebugVerbosity::PRODUCTION;
 
 if (isset($_POST['myLat']) && isset($_POST['myLong']) && isset($_POST['resource'])){
   $postedLat = $_POST['myLat'];
@@ -48,7 +48,12 @@ class IntelligentCities {
      * MAIN function that given a latitude and a longitude returns an Asset array which contains the environmental,
      * traffic and awareness information available on each node
      */
-    public static function gatherReportData($latitude, $longitude, $time = 1500118662204){
+    public static function gatherReportData($latitude, $longitude, $time = 1500118662204) {
+
+        // If no time was given, use the current time
+        if(!isset($time)) {
+            $time = time() * 1000; // Time units adjustment
+        }
         $nearbyAssets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
         $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
 
@@ -120,21 +125,33 @@ class IntelligentCities {
     private static function fetchAssetMedia($assetUid, $mediaType, $measurementTime) {
         IntelligentCities::validateToken();
 
-        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-        $start_time =   $measurementTime - $delta;
-        $end_time =     $measurementTime;
-        $predixId = IntelligentCities::ps_zone_id;
+        // Poll URL
+        $assetPollResponse = self::fetchAssetPollUrl($assetUid, $mediaType, $measurementTime);
+        $assetPollUrl = Asset::parseNodePollURL($assetPollResponse);
 
-        $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
-            . "/assets/" . $assetUid
-            . "/media?media-types=". $mediaType
-            . "&start-ts" . $start_time . "&end-ts=" . $end_time
-            , false, true, $predixId);
-        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
-            var_dump($response);
+        // Poll Entries
+        $assetPollEntries = self::fetchPollMedia($assetPollUrl);
+
+        if ($assetPollUrl != "") {
+            // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
+            $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
+            $start_time =   $measurementTime - $delta;
+            $end_time =     $measurementTime;
+            $predixId = IntelligentCities::ps_zone_id;
+
+            $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
+                . "/assets/" . $assetUid
+                . "/media?media-types=". $mediaType
+                . "&start-ts" . $start_time . "&end-ts=" . $end_time
+                , false, true, $predixId);
+            if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+                var_dump($response);
+            }
+            return $response;
+        } else {
+            return "";
         }
-        return $response;
+
     }
 
     /**
@@ -143,22 +160,39 @@ class IntelligentCities {
     private static function fetchAssetPollUrl($assetUid, $mediaType, $measurementTime) {
         IntelligentCities::validateToken();
 
-        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-        $start_time =   $measurementTime - $delta;
-        $end_time =     $measurementTime;
         $predixId = IntelligentCities::ps_zone_id;
 
         $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
-            . "/assets/" . $assetUid
-            . "/media?media-types=". $mediaType
-            . "&start-ts" . $start_time . "&end-ts=" . $end_time
+            . "/ondemand/assets/" . $assetUid
+            . "/media?mediaType=". $mediaType
+            . "&timestamp=" . $measurementTime
             , false, true, $predixId);
-        if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
         return $response;
     }
+
+
+    /**
+     * Function that given a media poll url, retrieves and returns the media url of the available media on it
+     **/
+    private static function fetchPollMedia($assetUid, $mediaType, $measurementTime) {
+        IntelligentCities::validateToken();
+
+        $predixId = IntelligentCities::ps_zone_id;
+
+        $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
+            . "/ondemand/assets/" . $assetUid
+            . "/media?mediaType=". $mediaType
+            . "&timestamp=" . $measurementTime
+            , false, true, $predixId);
+        if($GLOBALS['debug'] >= DebugVerbosity::PRODUCTION) {
+            var_dump($response);
+        }
+        return $response;
+    }
+
 
     /**
      * Function that given a latitude and longitude retrieves and returns an array with the nearby assets containing temperature and traffic data
@@ -196,7 +230,7 @@ class IntelligentCities {
 
             if($includeAwarenessData) {
                 // Awareness
-                $assetAwarenessResponse = IntelligentCities::fetchAssetMedia($asset->mediaAssetUid,"IMAGE", $measurementTime);
+                $assetAwarenessResponse = IntelligentCities::fetchAssetMedia($asset->mediaAssetUid,"IMAGE", time() * 1000);
                 $assetAwarenessData = json_decode($assetAwarenessResponse, true);
                 Asset::parseNodeAwarenessData($asset, $assetAwarenessData);
             }

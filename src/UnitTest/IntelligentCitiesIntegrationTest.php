@@ -11,7 +11,7 @@ function runIntelligentCitiesIntegrationTests() {
 }
 
 function testDetermineETADelay() {
-    $ETAModifier = IntelligentCities::determineETADelay(33.754226,-84.396138);
+    $ETAModifier = IntelligentCities::determineETADelay(33.754226,-84.396138, 1500118662204);
     var_dump($ETAModifier);
 }
 
