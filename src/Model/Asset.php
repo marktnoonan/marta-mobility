@@ -81,24 +81,21 @@ class Asset {
         return $asset;
     }
     public static function parseNodeAwarenessData(&$asset, $awarenessData){
-        if($GLOBALS['debug'] >= DebugVerbosity::MEDIUM) {
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($awarenessData);
         }
-        // TODO: Debug and remove mock data
-        $media = $awarenessData['_embedded']['medias'][0]['url'];
-        $asset->photoUrl = "https://ic-media-service.run.asv-pr.ice.predix.io/v2/mediastore/file/CAMERA-HYP1083-CAM-L_CAMERA-HYP1083-CAM-L_1459816592756_IMAGE.jpg";
+        $assetMediaUrl = Asset::parseNodeMediaData($awarenessData);
+        $asset->photoUrl = $assetMediaUrl;
     }
 
     public static function parseNodePollURL($pollData) {
-        var_dump($pollData);
         return $pollData['pollUrl'];
     }
 
     public static function parseNodeMediaData($pollData) {
-        var_dump($pollData);
         $pollEntries = $pollData['listOfEntries'];
         if($pollEntries['size'] >= 1){
-            return $pollEntries['content'][0];
+            return $pollEntries['content'][0]['url'];
         } else {
             return "";
         }

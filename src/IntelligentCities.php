@@ -124,34 +124,20 @@ class IntelligentCities {
      **/
     private static function fetchAssetMedia($assetUid, $mediaType, $measurementTime) {
         IntelligentCities::validateToken();
+        $predixId = IntelligentCities::ps_zone_id;
 
         // Poll URL
         $assetPollResponse = self::fetchAssetPollUrl($assetUid, $mediaType, $measurementTime);
-        $assetPollUrl = Asset::parseNodePollURL($assetPollResponse);
+        $assetPollData = json_decode($assetPollResponse, true);
+        $assetPollUrl = Asset::parseNodePollURL($assetPollData);
 
-        // Poll Entries
-        $assetPollEntries = self::fetchPollMedia($assetPollUrl);
+        // Asset Entry
+        $response = self::fetchPollEntries($assetPollUrl, $predixId);
 
-        if ($assetPollUrl != "") {
-            // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-            $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-            $start_time =   $measurementTime - $delta;
-            $end_time =     $measurementTime;
-            $predixId = IntelligentCities::ps_zone_id;
-
-            $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
-                . "/assets/" . $assetUid
-                . "/media?media-types=". $mediaType
-                . "&start-ts" . $start_time . "&end-ts=" . $end_time
-                , false, true, $predixId);
-            if($GLOBALS['debug'] >= DebugVerbosity::MINOR) {
-                var_dump($response);
-            }
-            return $response;
-        } else {
-            return "";
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($response);
         }
-
+        return $response;
     }
 
     /**
@@ -177,17 +163,11 @@ class IntelligentCities {
     /**
      * Function that given a media poll url, retrieves and returns the media url of the available media on it
      **/
-    private static function fetchPollMedia($assetUid, $mediaType, $measurementTime) {
+    private static function fetchPollEntries($mediaEntryUrl, $predixId) {
         IntelligentCities::validateToken();
 
-        $predixId = IntelligentCities::ps_zone_id;
-
-        $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
-            . "/ondemand/assets/" . $assetUid
-            . "/media?mediaType=". $mediaType
-            . "&timestamp=" . $measurementTime
-            , false, true, $predixId);
-        if($GLOBALS['debug'] >= DebugVerbosity::PRODUCTION) {
+        $response = IntelligentCities::CallAPI("GET", $mediaEntryUrl, false, true, $predixId);
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
         return $response;
@@ -276,6 +256,8 @@ class IntelligentCities {
 
         // Get the size of the array:
         $nodeArraySize = sizeof($nodeArray);
+
+        var_dump($nodeArray[0]);
 
         // Get the closest node to the user:
         $closestNodeIndex = 0;
