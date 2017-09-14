@@ -1,3 +1,3 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-include("../../src/martasimplehtmldom.php");
+ini_set('display_errors', 'on');
+include("../../src/App.php");

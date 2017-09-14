@@ -1,5 +1,7 @@
 # Paratransit Pal #
 
+A tool for improving the experience of MARTA Mobility users
+
 ## Installation ##
 You'll need [bower](http://bower.io) and [composer](http://getcomposer.org)
 Then

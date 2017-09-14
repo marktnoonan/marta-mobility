@@ -130,7 +130,7 @@ function getNodeData(lat, long, resource) {
 }
 
 function getTrips(username, password) {
-  var tripReq = paraRequest("./api/index.php", 'POST', "providedUsername=" + username + "&providedPassword=" + password, {'content-type': 'application/x-www-form-urlencoded'});
+  var tripReq = paraRequest("./api/login", 'POST', "username=" + username + "&password=" + password, {'content-type': 'application/x-www-form-urlencoded'});
   tripReq.then(function(dat) {
     addMartaDataToDom(dat);
   });

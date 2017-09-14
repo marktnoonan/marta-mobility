@@ -30,7 +30,7 @@ $customerInfo = $html->find('div[class=portletContent even]', 0);
 
 $bookingIDs = $html->find('td[class=tripHeader]');
 $arrayOfBookings = getBookings($bookingIDs);
-if ($html->find('span[class=Cancelled]', 0)->plaintext !== null) {
+if (is_object($something = $html->find('span[class=Cancelled]', 0)) && $something->plaintext !== null) {
     $cancelledTripExists = $html->find('span[class=Cancelled]', 0)->plaintext;
     array_shift($arrayOfBookings);
 }
@@ -39,8 +39,10 @@ $datesAndTimes = $html->find('td[valign=middle]');
 $arrayOfBookings = datesAndTimes($arrayOfBookings, $datesAndTimes);
 
 // this locates the "Past Trip" status, which can tell us that the bus has registered that the client was picked up.
-if ($html->find('span[class=smallbold]', 0)->plaintext !== "") {
+if (is_object($something = $html->find('span[class=smallbold]', 0)) && $something->plaintext !== "") {
     $pastTripInDom = true;
+} else {
+	$pastTripInDom = false;
 }
 $locations = $html->find('td[width=5]');
 $arrayOfBookings = locations($arrayOfBookings, $locations);
