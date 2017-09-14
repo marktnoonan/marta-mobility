@@ -48,9 +48,18 @@ class IntelligentCities {
      * MAIN function that given a latitude and a longitude returns an Asset array which contains the environmental,
      * traffic and awareness information available on each node
      */
-    public static function gatherReportData($latitude, $longitude, $time = 1500118662204){
+    public static function gatherReportData($latitude, $longitude, $time = 1500118662204) {
+
+        // If no time was given, use the current time
+        if(!isset($time)) {
+            $time = time() * 1000; // Time units adjustment
+        }
         $nearbyAssets = IntelligentCities::fetchNearbyAssetsData($latitude, $longitude, $time, true);
         $GLOBALS['client_token'] = null; // Delete the token meanwhile the token validation process gets implemented
+
+        // Place the closest node at the first position:
+        IntelligentCities::sortNodes($latitude, $longitude, $nearbyAssets);
+
         return $nearbyAssets;
     }
 
@@ -115,23 +124,55 @@ class IntelligentCities {
      **/
     private static function fetchAssetMedia($assetUid, $mediaType, $measurementTime) {
         IntelligentCities::validateToken();
+        $predixId = IntelligentCities::ps_zone_id;
 
-        // Time unit is in seconds, used base 6 on the delta to match time units ex: 1*60^1 = 60s, 1*60^2 = 3600s = 1h...
-        $delta = 1000 * pow(60, 1); // timestamp is in milliseconds
-        $start_time =   $measurementTime - $delta;
-        $end_time =     $measurementTime;
+        // Poll URL
+        $assetPollResponse = self::fetchAssetPollUrl($assetUid, $mediaType, $measurementTime);
+        $assetPollData = json_decode($assetPollResponse, true);
+        $assetPollUrl = Asset::parseNodePollURL($assetPollData);
+
+        // Asset Entry
+        $response = self::fetchPollEntries($assetPollUrl, $predixId);
+
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($response);
+        }
+        return $response;
+    }
+
+    /**
+     * Function that given the unique id of an asset, the media type and a measurement time, retrieves and returns a media url
+     **/
+    private static function fetchAssetPollUrl($assetUid, $mediaType, $measurementTime) {
+        IntelligentCities::validateToken();
+
         $predixId = IntelligentCities::ps_zone_id;
 
         $response = IntelligentCities::CallAPI("GET", IntelligentCities::media_url
-            . "/assets/" . $assetUid
-            . "/media?media-types=". $mediaType
-            . "&start-ts" . $start_time . "&end-ts=" . $end_time
+            . "/ondemand/assets/" . $assetUid
+            . "/media?mediaType=". $mediaType
+            . "&timestamp=" . $measurementTime
             , false, true, $predixId);
         if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
             var_dump($response);
         }
         return $response;
     }
+
+
+    /**
+     * Function that given a media poll url, retrieves and returns the media url of the available media on it
+     **/
+    private static function fetchPollEntries($mediaEntryUrl, $predixId) {
+        IntelligentCities::validateToken();
+
+        $response = IntelligentCities::CallAPI("GET", $mediaEntryUrl, false, true, $predixId);
+        if($GLOBALS['debug'] >= DebugVerbosity::LARGE) {
+            var_dump($response);
+        }
+        return $response;
+    }
+
 
     /**
      * Function that given a latitude and longitude retrieves and returns an array with the nearby assets containing temperature and traffic data
@@ -169,7 +210,7 @@ class IntelligentCities {
 
             if($includeAwarenessData) {
                 // Awareness
-                $assetAwarenessResponse = IntelligentCities::fetchAssetMedia($asset->mediaAssetUid,"IMAGE", $measurementTime);
+                $assetAwarenessResponse = IntelligentCities::fetchAssetMedia($asset->mediaAssetUid,"IMAGE", time() * 1000);
                 $assetAwarenessData = json_decode($assetAwarenessResponse, true);
                 Asset::parseNodeAwarenessData($asset, $assetAwarenessData);
             }
@@ -178,6 +219,73 @@ class IntelligentCities {
             }
         }
         return $assetArray;
+    }
+
+
+
+    /**
+     * Function that given a latitude and a longitude of two GPS coordinates, will return the distance in meters between them
+     * @param $latitude1
+     * @param $longitude1
+     * @param $latitude2
+     * @param $longitude2
+     * @return float
+     */
+    public static function distanceBetweenCoordinates($latitude1, $longitude1, $latitude2, $longitude2) {
+        // Calculate distance between latitude / longitude points: http://www.movable-type.co.uk/scripts/latlong.html
+
+        // Mean radius of planet earth in meters:
+        $earthRadiusMeters = 6371000.0;
+        $x = deg2rad( $longitude1 - $longitude2 ) * cos( deg2rad( $latitude1 ) );
+        $y = deg2rad( $latitude1 - $latitude2 );
+        $distanceMeters = $earthRadiusMeters * sqrt( $x*$x + $y*$y );
+        return $distanceMeters;
+    }
+
+    /**
+     * Function that places at the beginning of the array the
+     * @param $userLatitude
+     * @param $userLongitude
+     * @param $nodeArray
+     */
+    private static function sortNodes($userLatitude, $userLongitude, &$nodeArray) {
+        // If the array is empty, do nothing:
+        if (empty($nodeArray)) {
+            return;
+        }
+
+        // Get the size of the array:
+        $nodeArraySize = sizeof($nodeArray);
+        
+        // Get the closest node to the user:
+        $closestNodeIndex = 0;
+        $closestNodeDistance = IntelligentCities::distanceBetweenCoordinates(
+            $userLatitude,
+            $userLongitude,
+            $nodeArray[0]->latitude,
+            $nodeArray[0]->longitude
+        );
+
+        for ($currentNodeIndex = 0; $currentNodeIndex < $nodeArraySize; $currentNodeIndex++) {
+            $currentNode = $nodeArray[$currentNodeIndex];
+            $currentNodeDistance = IntelligentCities::distanceBetweenCoordinates(
+                $userLatitude,
+                $userLongitude,
+                $currentNode->latitude,
+                $currentNode->longitude
+            );
+
+            // If the current node is closer to the user than the closest known node:
+            if ($currentNodeDistance < $closestNodeDistance) {
+                $closestNodeIndex = $currentNodeIndex;
+                $closestNodeDistance = $currentNodeDistance;
+            }
+        }
+
+        // Switch the closest known node with the one at the first array position:
+        $tempNode = $nodeArray[0];
+        $nodeArray[0] = $nodeArray[$closestNodeIndex];
+        $nodeArray[$closestNodeIndex] = $tempNode;
     }
 
     /**
