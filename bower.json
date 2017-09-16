@@ -1,5 +1,5 @@
 {
-  "name": "marta",
+  "name": "paratransit-pal",
   "homepage": "https://github.com/oddlyaromatic/marta-mobility",
   "description": "",
   "main": "",
@@ -16,6 +16,7 @@
     "handlebars": "^4.0.10",
     "raphael": "^2.2.7",
     "push.js": "^0.0.13",
-    "promise-polyfill": "^6.0.2"
+    "promise-polyfill": "^6.0.2",
+    "justgage-toorshia": "^1.2.9"
   }
 }
