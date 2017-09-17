@@ -17,6 +17,7 @@
     "raphael": "^2.2.7",
     "push.js": "^0.0.13",
     "promise-polyfill": "^6.0.2",
-    "justgage-toorshia": "^1.2.9"
+    "justgage-toorshia": "^1.2.9",
+    "vue": "^2.4.4"
   }
 }
