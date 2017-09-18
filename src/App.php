@@ -53,4 +53,11 @@ $app->get('/logout', function($request, $response, $args) {
     return $response;
 });
 
+$app->post('/test', function ($request, $response, $args) {
+    $res = '{"clientName":"JOANNA M CUSTOMER","cancelled checker":true,"Past trip found":false,"bookings":[{"displayDate":"Saturday","date":"10-29-2016","iteratorDate":0,"eta":"07:22","displayEta":"7:22 AM","iteratorreadynugget":0,"readyTime":"06:55","displayReadyTime":"6:55 AM","iteratorreadyTime":0,"displayEndWindow":"7:25 AM","endWindow":"07:25","Status":"Scheduled","pickupAddress":"(CLIENT HOME ADDRESS)","iteratorLocation":0,"dropOffAddress":"JOB LOCATION","currentDay":"09-15-2017","currentTimeInMinutes":1290,"etaInMinutes":442,"math":true},{"displayDate":"Sunday","date":"10-30-2016","iteratorDate":1,"eta":"06:55","displayEta":"6:55 AM","iteratorreadynugget":1,"readyTime":"06:55","displayReadyTime":"6:55 AM","iteratorreadyTime":1,"displayEndWindow":"7:25 AM","endWindow":"07:25","Status":"Scheduled","pickupAddress":"(CLIENT HOME)","iteratorLocation":1,"dropOffAddress":"JOB LOCATION","currentDay":"09-15-2017","currentTimeInMinutes":1290,"etaInMinutes":415,"math":true},{"displayDate":"Wednesday","date":"11-02-2016","iteratorDate":2,"eta":"06:55","displayEta":"6:55 AM","iteratorreadynugget":2,"readyTime":"06:55","displayReadyTime":"6:55 AM","iteratorreadyTime":2,"displayEndWindow":"7:25 AM","endWindow":"07:25","Status":"Scheduled","pickupAddress":"(CLIENT HOME) ","iteratorLocation":2,"dropOffAddress":"JOB LOCATION","currentDay":"09-15-2017","currentTimeInMinutes":1290,"etaInMinutes":415,"math":true}],"Pick Up location data":"-82340912","Pickup Long":"-82340912","updatedAt":"9:30 PM"}';
+    $response = $response->withHeader('Content-Type', 'application/json;charset=utf-8');
+    $response->getBody()->write($res);
+    return $response;
+});
+
 $app->run();
