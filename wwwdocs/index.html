@@ -32,8 +32,8 @@
     <div class="text-align-center form-wrapper">
       <form class="" id="unpw-form" method="post">
         <h1 class="log-in">
-  Log In As:
-</h1><br>
+          Log In As:
+        </h1><br>
         <select class="user-type" name="user-type">
             <option value="Passenger">Passenger</option>
               <option value="Driver">Driver</option>
@@ -47,8 +47,8 @@
       </form>
 
       <button type="button" id="login">Login</button>
-      <br><br><br>
-      For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with questions or feedback.
+      <br><br><br> For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with
+      questions or feedback.
     </div>
 
 
@@ -60,167 +60,152 @@
       Here will be the information panel!
     </div>
 
-<script id="my-reports-template" type="text/x-handlebars-template">
-  <span class="closer-for-my-reports">×</span>
-<h1>My Reports</h1>
-  {{#each dbResults.reports}}
-  <div class="card">
-  <div class="report-header"><span class="report-icon">{{{iconString}}}</span>
-    "<b>{{category}}</b>", report generated on
-    <br>
-    {{prettyTime}}
-  </div>
-  {{#if comments}}
-  <span class="info-label">Comments</span><div class="report-info">{{comments}}</div>
-  {{/if}}
-  <span class="info-label">Location</span><div class="report-info">Near {{prettyAddress}}<br>(exact location: {{location.latitude}}, {{location.longitude}})</div>
-  {{#if nodedata}}<span class="info-label">Nearby Nodes</span>
-  <div class="report-info">
-  {{#each nodedata as |val key|}}
-    {{val.envAssetUid}}
-  {{/each}}
-  </div>
-  <span class="info-label">Traffic Speed</span>
-  <div class="report-info">{{nodedata.[0].vehicleSpeed}} mph
-  </div>
-  <span class="info-label">Nearby Vehicles</span>
-  <div class="report-info">{{nodedata.[0].vehicleCount}}
-  </div>
-  {{/if}}
+    <script id="my-reports-template" type="text/x-handlebars-template">
+      <span class="closer-for-my-reports">×</span>
+      <h1>My Reports</h1>
+      {{#each dbResults.reports}}
+      <div class="card">
+        <div class="report-header"><span class="report-icon">{{{iconString}}}</span> "
+          <b>{{category}}</b>", report generated on
+          <br> {{prettyTime}}
+        </div>
+        {{#if comments}}
+        <span class="info-label">Comments</span>
+        <div class="report-info">{{comments}}</div>
+        {{/if}}
+        <span class="info-label">Location</span>
+        <div class="report-info">Near {{prettyAddress}}<br>(exact location: {{location.latitude}}, {{location.longitude}})</div>
+        {{#if nodedata}}<span class="info-label">Nearby Nodes</span>
+        <div class="report-info">
+          {{#each nodedata as |val key|}} {{val.envAssetUid}} {{/each}}
+        </div>
+        <span class="info-label">Traffic Speed</span>
+        <div class="report-info">{{nodedata.[0].vehicleSpeed}} mph
+        </div>
+        <span class="info-label">Nearby Vehicles</span>
+        <div class="report-info">{{nodedata.[0].vehicleCount}}
+        </div>
+        {{/if}}
 
-</div>
-{{/each}}
-</script>
+      </div>
+      {{/each}}
+    </script>
 
-<script id="my-info-template" type="text/x-handlebars-template">
-  <span class="closer-for-my-info">×</span>
-<h1>My Information</h1>
+    <script id="my-info-template" type="text/x-handlebars-template">
+      <span class="closer-for-my-info">×</span>
+      <h1>My Information</h1>
 
-  {{#with dbResults}}
-<section data-key="info">
-  <h2>About Me</h2>
-  <br>
-  <div class="card">
-    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+      {{#with dbResults}}
+      <section data-key="info">
+        <h2>About Me</h2>
+        <br>
+        <div class="card">
+          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{info.name}}</span><br>
-    <span class="info-label">Cell Number</span>: <span class="may-edit-text cell" data-text-type="cell">{{info.cell}}</span><br>
-    <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{info.email}}</span><br>
-    <span class="info-label">Tracking</span>: <span class="may-edit tracking">{{info.track}}</span>
-    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{info.name}}</span><br>
+          <span class="info-label">Cell Number</span>: <span class="may-edit-text cell" data-text-type="cell">{{info.cell}}</span><br>
+          <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{info.email}}</span><br>
+          <span class="info-label">Tracking</span>: <span class="may-edit tracking">{{info.track}}</span>
+          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
 
-  </div>
-</section>
-<br>
-<section data-key="emergency-contacts">
-  <h2>Emergency Contacts</h2>
-  <br>
-    {{#each emergency-contacts}}
-  <div class="card">
-    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+        </div>
+      </section>
+      <br>
+      <section data-key="emergency-contacts">
+        <h2>Emergency Contacts</h2>
+        <br> {{#each emergency-contacts}}
+        <div class="card">
+          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{@key}}</span><br>
-    <span class="info-label" data-text-type="cell">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
-    <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{this.email}}</span>
-    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{@key}}</span><br>
+          <span class="info-label" data-text-type="cell">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
+          <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{this.email}}</span>
+          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
 
-  </div>
-    {{/each}}
-    <div class="card"><i class="fa fa-plus" aria-hidden="true"></i>
- Add an emergency contact</div>
-</section>
-<br>
-<section data-key="saved-locations">
-  <h2>Saved Locations</h2>
-  <br>
-    {{#each saved-locations}}
-  <div class="card">
-    <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+        </div>
+        {{/each}}
+        <div class="card"><i class="fa fa-plus" aria-hidden="true"></i> Add an emergency contact</div>
+      </section>
+      <br>
+      <section data-key="saved-locations">
+        <h2>Saved Locations</h2>
+        <br> {{#each saved-locations}}
+        <div class="card">
+          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
 </span>
-    <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="short-name">{{@key}}</span><br>
-    <span class="info-label">Address</span>: <span class="may-edit-text address" data-text-type="{{@key}}">{{this}}</span><br>
-    <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
-  </div>
-    {{/each}}
-  <div class="card"><i class="fa fa-plus" aria-hidden="true"></i>
- Add a new location</div>
-</section>
-  {{/with}}
-</script>
+          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="short-name">{{@key}}</span><br>
+          <span class="info-label">Address</span>: <span class="may-edit-text address" data-text-type="{{@key}}">{{this}}</span><br>
+          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
+        </div>
+        {{/each}}
+        <div class="card"><i class="fa fa-plus" aria-hidden="true"></i> Add a new location</div>
+      </section>
+      {{/with}}
+    </script>
 
-<script id="driver-template" type="text/x-handlebars-template">
-<div>
-<div class="driver-info">
-  <br> <h1>Driver View</h1>
-  <h2>Your Next Pickup</h2>
-  <br>
-Passenger: {{dataFromMarta.[0].clientName}}<br>
-  {{#with dataFromMarta.[0].bookings.[0]}}
-Date: {{date}}<br>
-  Pick Up At {{pickupAddress}}<br>
-  Drop Off At: {{dropOffAddress}}<br>
-  <hr>
-  <div class="driver-times">
-    <div class="driver-time">
-      <b>Ready Time</b><br>
-      {{displayReadyTime}}
-    </div>
-    <div class="driver-time">
-      <b>Pickup ETA</b><br>
-  {{displayEta}}
-    </div>
-    </div>
-  {{/with}}
-  <hr>
-<h2>Add a Delay</h2>
-<div class="driver-delay-options">
-  <div class="driver-delay-option" data-action="SMALL">
-    Small
-  </div>
-  <div class="driver-delay-option" data-action="MEDIUM">
-    Medium
-  </div>
-  <div class="driver-delay-option" data-action="LARGE">
-    Large
-  </div>
-  <div class="driver-delay-option" data-action="MAJOR">
-    Major
-  </div>
-</div>
+    <script id="driver-template" type="text/x-handlebars-template">
+      <div>
+        <div class="driver-info">
+          <br>
+          <h1>Driver View</h1>
+          <h2>Your Next Pickup</h2>
+          <br> Passenger: {{dataFromMarta.[0].clientName}}<br> {{#with dataFromMarta.[0].bookings.[0]}} Date: {{date}}<br>          Pick Up At {{pickupAddress}}<br> Drop Off At: {{dropOffAddress}}<br>
+          <hr>
+          <div class="driver-times">
+            <div class="driver-time">
+              <b>Ready Time</b><br> {{displayReadyTime}}
+            </div>
+            <div class="driver-time">
+              <b>Pickup ETA</b><br> {{displayEta}}
+            </div>
+          </div>
+          {{/with}}
+          <hr>
+          <h2>Add a Delay</h2>
+          <div class="driver-delay-options">
+            <div class="driver-delay-option" data-action="SMALL">
+              Small
+            </div>
+            <div class="driver-delay-option" data-action="MEDIUM">
+              Medium
+            </div>
+            <div class="driver-delay-option" data-action="LARGE">
+              Large
+            </div>
+            <div class="driver-delay-option" data-action="MAJOR">
+              Major
+            </div>
+          </div>
 
-</div>
-</script>
+        </div>
+    </script>
 
-<script id="dispatcher-template" type="text/x-handlebars-template">
-<div>
-  <h1> Dispatcher </h1>
-<div class="driver-info">
-<h3>Active trip for {{dataFromMarta.[0].clientName}}</h3><br>
-  {{#with dataFromMarta.[0].bookings.[0]}}
-Date: {{date}}<br>
-Passenger Ready Time: {{displayReadyTime}}<br>
-Stored ETA: {{displayEta}}<br>
-Pick Up At: {{pickupAddress}}<br>
-Drop Off At: {{dropOffAddress}}<br>
-  {{/with}}
-  <br>
-<h2>Trip info</h2>
-<br>
-<b>Live Marta ETA</b>: <input type="text" class="eta-from-db" value="{{dbResults.etaFromMarta}}" onchange="changeETA(this.value)"></input> <br>Edit as needed, please keep format HH:MM military time :)<br><br>
-<b>Paratransit Pal Delay Modifier</b>: <span class="modifier-from-db">{{dbResults.modifier}} minutes extra delay</span> <br><br>Modifier is calculated based on live node data and historical factors, if available. ETA shown to users is a combination of these two pieces of information.
+    <script id="dispatcher-template" type="text/x-handlebars-template">
+      <div>
+        <h1> Dispatcher </h1>
+        <div class="driver-info">
+          <h3>Active trip for {{dataFromMarta.[0].clientName}}</h3><br> {{#with dataFromMarta.[0].bookings.[0]}} Date: {{date}}<br>          Passenger Ready Time: {{displayReadyTime}}<br> Stored ETA: {{displayEta}}<br> Pick Up At: {{pickupAddress}}<br>          Drop Off At: {{dropOffAddress}}<br> {{/with}}
+          <br>
+          <h2>Trip info</h2>
+          <br>
+          <b>Live Marta ETA</b>: <input type="text" class="eta-from-db" value="{{dbResults.etaFromMarta}}" onchange="changeETA(this.value)"></input>
+          <br>Edit as needed, please keep format HH:MM military time :)<br><br>
+          <b>Paratransit Pal Delay Modifier</b>: <span class="modifier-from-db">{{dbResults.modifier}} minutes extra delay</span>          <br><br>Modifier is calculated based on live node data and historical factors, if available. ETA shown to users
+          is a combination of these two pieces of information.
 
-</div>
+        </div>
 
-</div>
-</script>
+      </div>
+    </script>
 
 
     <script id="entry-template" type="text/x-handlebars-template">
 
       <div class="client-info text-align-center">
         Hi <b>{{dataFromMarta.[0].clientName}}!</b>
-</></div>
-        <br>
+        </>
+      </div>
+      <br>
       </div>
       {{#with dataFromMarta.[0].bookings.[0]}}
       <h2>Your Next Trip</h2><br>
@@ -274,7 +259,8 @@ Drop Off At: {{dropOffAddress}}<br>
 
           <center>
 
-            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}} {{else}}No van is scheduled for this trip. {{/if}}
+            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}} {{else}}No van is scheduled
+              for this trip. {{/if}}
 
             </div>
 
@@ -323,7 +309,7 @@ Drop Off At: {{dropOffAddress}}<br>
     <form class="make-report-form">
       <b>Add to report:</b><br><br>
       <center>
-      <textarea name="what-happened"></textarea><br><br>
+        <textarea name="what-happened"></textarea><br><br>
         <button type="button" name="submit-report">Complete Report</button>
       </center>
     </form>
