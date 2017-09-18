@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Vue Example</title>
+    <style>
+        body {
+            font-family: soleil, Helvetica, Arial, sans-serif;
+            text-align: center;
+            font-size: 14px;
+            color: #444;
+            background-color: #fff;
+            padding-top: 45px;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body style="text-align:center">
+    <div id="app">
+        <login-form v-if="!loggedIn" v-on:login="login" :init-user-type="userType"></login-form>
+        <template v-if="loggedIn">
+                {{userType}}
+                <template v-if="userType == 'Passenger'">
+                    <passenger-view :user-info="userInfo"></passenger-view>
+                </template>
+                <template v-else-if="userType == 'Driver'">
+                    Driver!
+                </template>
+                <template v-else>
+                    I don't know!
+                </template>
+            </template>
+    </div>
+    <script src="dist/build.js"></script>
+</body>
+
+</html>
