@@ -3,4 +3,4 @@
 /wwwdocs/bower_components
 node_modules/
 .idea/
-
+/wwwdocs/dist
