@@ -13,7 +13,7 @@ export default {
                 var id = el.id;
                 var vals = binding.value;
                 var convertToTime = function() {
-                    return vals.newEta;
+                    return vals.eta;
                 };
                 new JustGage({
                     id: id,
@@ -57,6 +57,15 @@ export default {
                         ]
                     }
                 });
+                // mess with various gauge library defaults
+                var texts = el.querySelectorAll("text");
+
+                texts.forEach(function(element) {
+                    element.setAttribute("fill", "#000");
+                });
+
+                var valueLabel = el.querySelector("svg > text:nth-child(7)");
+                valueLabel.setAttribute("y", "100");
             }
         }
     },
@@ -67,42 +76,40 @@ export default {
                 minTime: this.minTime,
                 maxTime: this.maxTime,
                 delay: this.delay,
-                newEta: this.newEta
+                eta: this.eta
             };
         },
         div_id: function() {
             return "justGageDiv" + Math.floor(Math.random() * 5000);
         }
     },
-    props: ['time', 'minTime', 'maxTime', 'delay', 'newEta'],
+    props: ['time', 'minTime', 'maxTime', 'delay', 'eta'],
 }
 </script>
 
 <style scoped>
-.ready-time-gage {
-  font-size: 12px;
-  margin-bottom: 8px;
-}
 
+.gauge-container {
+    margin: 0 auto;
+    margin-top: -10px;
+    text-align: center;
+}
+</style>
+
+<style>
 /*extremely fragile selector that will need to be updated if the SVG text
 elements change again*/
 
 svg>text:nth-child(7) {
-  font-size: 16px !important;
+    font-size: 16px !important;
 }
 
 text+text {
-  font-size: 12px !important;
+    font-size: 12px !important;
 }
 
 svg {
-  position: relative;
-}
-
-.gauge-container {
-  margin: 0 auto;
-  margin-top: -10px;
-  text-align: center;
+    position: relative;
 }
 
 </style>

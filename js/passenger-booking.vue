@@ -5,7 +5,7 @@
       <span class="date">{{booking.date}}</span>
     </div>
     <div class="ready-time-gage">{{booking.displayReadyTime}}</div>
-    <passenger-gauge :time="booking.eta" :min-time="earlyTime" :max-time="booking.displayEndWindow" :delay="delay" :new-eta="newEta"></passenger-gauge>
+    <passenger-gauge :time="booking.eta" :min-time="earlyTime" :max-time="booking.displayEndWindow" :delay="delay" :eta="newEta"></passenger-gauge>
     <span class="ready-time">
       <b>Start Window</b>: {{booking.displayReadyTime}}</span>
     <span class="ready-time">
@@ -55,7 +55,7 @@ export default {
       return this.convertTimeFromMinutes(this.windowEndInMinutes - 60);
     },
     delay: function() {
-      return 30 - (this.windowEndInMinutes - this.convertTimeToMinutes(this.booking.eta));
+      return (this.convertTimeToMinutes(this.booking.eta) - (this.windowEndInMinutes - 60));
     },
     newEta: function() {
       return this.booking.eta;
@@ -189,4 +189,11 @@ div.locations {
 .no-eta {
   background-color: "lightblue";
 }
+
+.ready-time-gage {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+
 </style>
