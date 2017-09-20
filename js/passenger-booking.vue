@@ -69,19 +69,14 @@ export default {
       if (!this.booking.eta) {
         return;
       }
-
       ret.scheduled = true;
-
       var timeFromNow = this.convertTimeToMinutes(this.booking.eta) - nowInMinutes;
-
       if (timeFromNow <= 5 && timeFromNow > 0) {
         ret.five_minutes = true;
       }
-
       if (timeFromNow <= 30 && timeFromNow > 0) {
         ret.trip_soon = true;
       }
-
       if (timeFromNow <= 0 && timeFromNow > -10) {
         ret.here_now = true;
       }
@@ -125,7 +120,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
 .booking {

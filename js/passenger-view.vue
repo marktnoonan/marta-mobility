@@ -14,17 +14,20 @@
                 <passenger-booking :booking="booking" :idx="index"></passenger-booking>
             </div>
         </div>
+        <bottom-menu></bottom-menu>
     </div>
 </template>
 
 <script>
 import PassengerBooking from './passenger-booking.vue';
 import AppHeader from './header.vue';
+import BottomMenu from './bottom-menu.vue';
 
 export default {
     components: {
         PassengerBooking,
-        AppHeader
+        AppHeader,
+        BottomMenu
     },
     data: function() {
         return {}
