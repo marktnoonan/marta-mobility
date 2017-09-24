@@ -7,19 +7,19 @@
                 <i class="fa fa-ambulance fa-lg" aria-hidden="true"></i> 911 EMERGENCY
             </div>
         </a>
-        <div class="bottom-menu-item" data-action="I am lost">
+        <div class="bottom-menu-item" data-action="lost" v-on:click="emitHelp($event)">
             <i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <br><br>I am
             <b>LOST</b>
         </div>
-        <div class="bottom-menu-item" data-action="I need help">
+        <div class="bottom-menu-item" data-action="help" v-on:click="emitHelp($event)">
             <i class="fa fa-flag fa-2x" aria-hidden="true"></i><br><br>I need
             <b>HELP</b>
         </div>
-        <div class="bottom-menu-item" data-action="Incident Report">
+        <div class="bottom-menu-item" data-action="incident" v-on:click="emitHelp($event)">
             <i class="fa fa-info-circle fa-2x" aria-hidden="true"></i><br><br>Report
             <b>INCIDENT</b>
         </div>
-        <div class="bottom-menu-item" data-action="Crime Report">
+        <div class="bottom-menu-item" data-action="crime" v-on:click="emitHelp($event)">
             <i class="fa fa-gavel fa-2x" aria-hidden="true"></i><br><br>Report
             <b>CRIME</b>
         </div>
@@ -27,6 +27,14 @@
 </template>
 
 <script>
+const helpTexts = {
+    'lost' : "that you are lost. Get directions to: <ol> <li>A saved location</li><li>Your last drop-off location</li><li>Your next pickup location</li><li>Local police</li></ol>",
+    "help" : "that you need help. You may wish to: <ol><li>Call 911</li><li>Get Directions</li></ol>",
+    "incident" : "that you are reporting an incident. ",
+    "crime" : "that you are reporting a crime. "
+};
+
+
 export default {
     data: function() {
         return {
@@ -36,6 +44,10 @@ export default {
     methods: {
         showMenu: function() {
             this.menu = !this.menu;
+        },
+        emitHelp: function($event) {
+            this.menu = !this.menu;
+            this.$emit('help-event', {text: helpTexts[$event.currentTarget.dataset.action]});
         }
     }
 }

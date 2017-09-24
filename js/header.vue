@@ -3,7 +3,7 @@
     <div class="logo">
       <i class="fa fa-wheelchair-alt fa-lg" aria-hidden="true"></i> Paratransit Pal
       </div>
-    <app-menu></app-menu>
+    <app-menu v-on:open-info="showEvent" @open-reports="showReports"></app-menu>
     
   </div>
 </template>
@@ -14,6 +14,14 @@ import AppMenu from './app-menu.vue';
 export default {
   components: {
       AppMenu
+  },
+  methods: {
+      showEvent: function() {
+          this.$emit('info-event');
+      },
+      showReports: function() {
+          this.$emit('reports-event');
+      }
   }
 }
 </script>
