@@ -91,4 +91,7 @@ export default {
   background-color: #dff0d8;
 }
 
+a {
+    display: block;
+}
 </style>
