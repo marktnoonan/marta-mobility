@@ -8,9 +8,9 @@
         </div>
         <div class="menu-panel">
             <ul class="menu-list">
-                <li data-request="information">My Information</li>
-                <li data-request="reports">My Reports</li>
-                <li data-request="logout">Log Out</li>
+                <li><a @click="openInfo">My Information</a></li>
+                <li><a @click="openReports">My Reports</a></li>
+                <li><a @click="logOut">Log Out</a></li>
             </ul>
         </div>
     </div>
@@ -26,6 +26,17 @@ export default {
     methods: {
         toggleMenu: function() {
             this.menu = !this.menu;
+        },
+        openInfo: function() {
+            this.$emit('open-info');
+            this.menu = false;
+        },
+        openReports: function() {
+            this.$emit('open-reports');
+            this.menu = false;
+        },
+        logOut: function() {
+            this.$emit('logout');
         }
     }
 }
