@@ -1,8 +1,18 @@
-import Vue from 'vue';
-import LoginForm from './login-form.vue';
+/* import Vue from 'vue';
+ */import LoginForm from './login-form.vue';
 import PassengerView from './passenger-view.vue';
 
 const LOGIN_URL = "./api/test";
+
+var firebaseApp = firebase.initializeApp({
+    apiKey: "AIzaSyAVILGslPYXyEa1kF84vxk3d2OxKzxhweo",
+    authDomain: "mobility-66c54.firebaseapp.com",
+    databaseURL: "https://mobility-66c54.firebaseio.com",
+    projectId: "mobility-66c54",
+    storageBucket: "mobility-66c54.appspot.com",
+    messagingSenderId: "582170341021"
+  });
+var db = firebaseApp.database();
 
 new Vue({
     el: '#app',
@@ -13,11 +23,21 @@ new Vue({
     data: {
         userInfo: null,
         userType: "Passenger",
+        userReports: null,
     },
     computed: {
         loggedIn: function () {
             return this.userInfo != null;
         }
+    },
+    firebase: {
+        reports: 
+            db.ref('/reports'),
+            /* asObject: true,
+            readyCallback: function() {
+                console.log('FIREBASE READY');
+            }
+        } */
     },
     methods: {
         login: function (loginInfo) {
@@ -26,6 +46,7 @@ new Vue({
             tripReq.then(function (dat) {
                 vm.userInfo = JSON.parse(dat);
                 vm.userType = loginInfo.usertype;
+                vm.userReports = vm.reports;
             });
         },
         request: function (url, method, params, headers) {

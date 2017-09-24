@@ -4,7 +4,7 @@
         <h1>My Reports</h1>
         <div v-for="report in reports" class="card">
             <div class="report-header">
-                <span class="report-icon">{{report.iconString}}</span> "
+                <span class="report-icon" :class="getIconClass(report)">{{report.iconString}}</span> "
                 <b>{{report.category}}</b>", report generated on
                 <br> {{report.prettyTime}}
             </div>
@@ -13,11 +13,11 @@
                 <div class="report-info">{{report.comments}}</div>
             </div>
             <span class="info-label">Location</span>
-            <div class="report-info">Near {{report.prettyAddress}}<br>(exact location: {{report.location.latitude}}, {{report.location.longitude}})</div>
-            <div v-if="nodedata">
+            <div class="report-info">Near {{report.prettyAddress}}<br><div v-if="report.location" >(exact location: {{report.location.latitude}}, {{report.location.longitude}})</div></div>
+            <div v-if="report.nodedata">
                 <span class="info-label">Nearby Nodes</span>
                 <div class="report-info">
-                    <div v-for="(val, key) in nodedata"> {{val.envAssetUid}} </div>
+                    <div v-for="(val, key) in report.nodedata"> {{val.envAssetUid}} </div>
                 </div>
                 <span class="info-label">Traffic Speed</span>
                 <div class="report-info">{{report.nodedata[0].vehicleSpeed}} mph
@@ -37,6 +37,12 @@ export default {
     methods: {
         hideReports: function() {
             this.$emit('reports-event');
+        },
+        getIconClass: function(report) {
+            switch (report.category) {
+                case 'I am lost': return ['fa', 'fa-map-marker', 'fa-2x']; break;
+                default: return ['fa', 'fa-info-circle', 'fa-2x']; break;
+            }
         }
     }
 }

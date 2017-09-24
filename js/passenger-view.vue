@@ -2,7 +2,7 @@
     <div>
         <app-header @info-event="handleInfoEvent" @reports-event="handleReportEvent"></app-header>
         <my-info v-if="showInfo" :user-info="userInfo" @info-event="handleInfoEvent"></my-info>
-        <my-reports v-if="showReports" :reports="userInfo.reports" @reports-event="handleReportEvent"></my-reports>
+        <my-reports v-if="showReports" :reports="userReports" @reports-event="handleReportEvent"></my-reports>
         <div class="main">
             <div>
                 <div class="client-info text-align-center">
@@ -49,7 +49,7 @@ export default {
             showReports: false,
         }
     },
-    props: ['userInfo'],
+    props: ['userInfo', 'userReports'],
     methods: {
         handleHelpEvent: function($event) {
             this.showReportForm = !this.showReportForm;
