@@ -13,7 +13,7 @@
             <h2>Trip info</h2>
             <br>
             <b>Live Marta ETA</b>:
-            <input type="text" class="eta-from-db" value="{{dbResults.etaFromMarta}}" onchange="changeETA(this.value)"></input>
+            <input type="text" class="eta-from-db" v-model="etaFromMarta" onchange="changeETA(this.value)"></input>
             <br>Edit as needed, please keep format HH:MM military time :)<br><br>
             <b>Paratransit Pal Delay Modifier</b>:
             <span class="modifier-from-db">{{dbResults.modifier}} minutes extra delay</span>
