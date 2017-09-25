@@ -1,7 +1,7 @@
 <template>
     <div>
         <app-header @info-event="handleInfoEvent" @reports-event="handleReportEvent"></app-header>
-        <my-info v-if="showInfo" :user-info="userInfo" @info-event="handleInfoEvent"></my-info>
+        <my-info v-if="showInfo" :user-info="userInfo.fbUserInfo" :user-contacts="userContacts" :user-locations="userLocations" @info-event="handleInfoEvent"></my-info>
         <my-reports v-if="showReports" :reports="userReports" @reports-event="handleReportEvent"></my-reports>
         <div class="main">
             <div>
@@ -16,7 +16,7 @@
                 <passenger-booking :booking="booking" :idx="index"></passenger-booking>
             </div> -->
             <div class="booking" :id="'booking0'">
-                <passenger-booking :booking="userInfo.bookings[0]" :idx="0"></passenger-booking>
+                <passenger-booking :booking="userInfo.bookings[0]" :idx="0" :trip-info="tripInfo"></passenger-booking>
             </div>
         </div>
         <report-form v-if="showReportForm" v-on:help-event="handleHelpEvent($event)" :help-report="helpReport"></report-form>
@@ -49,7 +49,7 @@ export default {
             showReports: false,
         }
     },
-    props: ['userInfo', 'userReports'],
+    props: ['tripInfo', 'userInfo', 'userReports', 'userContacts', 'userLocations'],
     methods: {
         handleHelpEvent: function($event) {
             this.showReportForm = !this.showReportForm;

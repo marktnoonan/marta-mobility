@@ -46,7 +46,7 @@ export default {
     PizzaTracker,
     PassengerGauge
   },
-  props: ['booking', 'idx'],
+  props: ['booking', 'idx', 'tripInfo'],
   computed: {
     windowEndInMinutes: function() {
       return this.convertTimeToMinutes(this.booking.endWindow);
@@ -55,10 +55,17 @@ export default {
       return this.convertTimeFromMinutes(this.windowEndInMinutes - 60);
     },
     delay: function() {
-      return (this.convertTimeToMinutes(this.booking.eta) - (this.windowEndInMinutes - 60));
+      var eta = (this.tripInfo.eta ? this.tripInfo.eta[".value"] : this.booking.eta);
+      return (this.convertTimeToMinutes(eta) - (this.windowEndInMinutes - 60));
     },
     newEta: function() {
-      return this.booking.eta;
+      var eta;
+      if (this.tripInfo.eta) {
+         eta = this.tripInfo.eta[".value"];
+      } else {
+        eta = this.booking.eta;
+      }
+      return this.convertTimeFromMinutes(this.convertTimeToMinutes(eta));
     },
     steps: function() {
       var ret = {};

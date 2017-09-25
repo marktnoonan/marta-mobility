@@ -36,7 +36,7 @@
         <login-form v-if="!loggedIn" v-on:login="login" :init-user-type="userType"></login-form>
         <template v-if="loggedIn">
             <template v-if="userType == 'Passenger'">
-                <passenger-view :user-info="userInfo" :user-reports="userReports"></passenger-view>
+                <passenger-view :trip-info="tripInfo" :user-info="userInfo" :user-reports="userReports" :user-contacts="userContacts" :user-locations="userLocations"></passenger-view>
             </template>
             <template v-else-if="userType == 'Driver'">
                 Driver!

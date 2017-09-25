@@ -26,7 +26,7 @@
         <section data-key="emergency-contacts">
             <h2>Emergency Contacts</h2>
             <br>
-            <div v-for="contact in userInfo.emergencyContacts" class="card">
+            <div v-for="contact in userContacts" class="card">
                 <span class="edit">
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                 </span>
@@ -47,7 +47,7 @@
         <section data-key="saved-locations">
             <h2>Saved Locations</h2>
             <br>
-            <div class="card" v-for="location in userInfo.locations">
+            <div class="card" v-for="location in userLocations">
                 <span class="edit">
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                 </span>
@@ -66,7 +66,7 @@
 
 <script>
 export default {
-  props: ["userInfo"],
+  props: ["userInfo", "userContacts", "userLocations"],
   methods: {
       hideInfo: function() {
           this.$emit('info-event');

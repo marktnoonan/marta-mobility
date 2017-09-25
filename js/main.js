@@ -4,14 +4,23 @@ import PassengerView from './passenger-view.vue';
 
 const LOGIN_URL = "./api/test";
 
-var firebaseApp = firebase.initializeApp({
+/* var firebaseApp = firebase.initializeApp({
     apiKey: "AIzaSyAVILGslPYXyEa1kF84vxk3d2OxKzxhweo",
     authDomain: "mobility-66c54.firebaseapp.com",
     databaseURL: "https://mobility-66c54.firebaseio.com",
     projectId: "mobility-66c54",
     storageBucket: "mobility-66c54.appspot.com",
     messagingSenderId: "582170341021"
-  });
+}); */
+var config = {
+    apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
+    authDomain: "mobility-eta.firebaseapp.com",
+    databaseURL: "https://mobility-eta.firebaseio.com",
+    projectId: "mobility-eta",
+    storageBucket: "",
+    messagingSenderId: "142807263400"
+  };
+  var firebaseApp = firebase.initializeApp(config);
 var db = firebaseApp.database();
 
 new Vue({
@@ -24,6 +33,8 @@ new Vue({
         userInfo: null,
         userType: "Passenger",
         userReports: null,
+        userContacts: null,
+        userLocations: null,
     },
     computed: {
         loggedIn: function () {
@@ -31,13 +42,25 @@ new Vue({
         }
     },
     firebase: {
-        reports: 
-            db.ref('/reports'),
-            /* asObject: true,
-            readyCallback: function() {
-                console.log('FIREBASE READY');
-            }
-        } */
+        reports: db.ref('/reports'),
+        fbUserInfo: {
+            source: db.ref('/info'),
+            asObject: true
+        },
+        etaRef: {
+            source: db.ref("eta-from-marta"),
+            asObject: true
+        },
+        modifierRef: {
+            source: db.ref("eta-modifier"),
+            asObject: true
+        },
+        emergencyContactsRef: db.ref("emergency-contacts"),
+        myInfoRef: {
+            source: db.ref("info"),
+            asObject: true
+        },
+        locationsRef: db.ref("saved-locations")
     },
     methods: {
         login: function (loginInfo) {
@@ -45,8 +68,15 @@ new Vue({
             var tripReq = this.request(LOGIN_URL, 'POST', "username=" + loginInfo.username + "&password=" + loginInfo.password, { 'content-type': 'application/x-www-form-urlencoded' });
             tripReq.then(function (dat) {
                 vm.userInfo = JSON.parse(dat);
+                vm.userInfo.fbUserInfo = vm.fbUserInfo;
+                vm.tripInfo = {
+                    eta: vm.etaRef,
+                    modifier: vm.modifierRef
+                };
                 vm.userType = loginInfo.usertype;
                 vm.userReports = vm.reports;
+                vm.userContacts = vm.emergencyContactsRef;
+                vm.userLocations = vm.locationsRef;
             });
         },
         request: function (url, method, params, headers) {
