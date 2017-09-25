@@ -1,7 +1,7 @@
 <template>
     <div>
         <app-header @info-event="handleInfoEvent" @reports-event="handleReportEvent"></app-header>
-        <my-info v-if="showInfo" :user-info="userInfo.fbUserInfo" :user-contacts="userContacts" :user-locations="userLocations" @info-event="handleInfoEvent"></my-info>
+        <my-info v-if="showInfo" @update-info="updateInfo($event)" :user-info="userInfo.fbUserInfo" :user-contacts="userContacts" :user-locations="userLocations" @info-event="handleInfoEvent"></my-info>
         <my-reports v-if="showReports" :reports="userReports" @reports-event="handleReportEvent"></my-reports>
         <div class="main">
             <div>
@@ -68,6 +68,9 @@ export default {
                 this.showReportForm = false;
                 this.showInfo = false;
             }
+        },
+        updateInfo: function($event) {
+            this.userInfo.fbUserInfo.name = 'test';
         }
     }
 }
