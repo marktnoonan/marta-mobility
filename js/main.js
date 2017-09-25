@@ -1,6 +1,8 @@
 /* import Vue from 'vue';
  */import LoginForm from './login-form.vue';
 import PassengerView from './passenger-view.vue';
+import DriverView from './driver-view.vue';
+import DispatcherView from './dispatcher-view.vue';
 
 const LOGIN_URL = "./api/test";
 
@@ -27,7 +29,9 @@ new Vue({
     el: '#app',
     components: {
         LoginForm,
-        PassengerView
+        PassengerView,
+        DriverView,
+        DispatcherView
     },
     data: {
         userInfo: null,

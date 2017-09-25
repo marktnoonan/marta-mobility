@@ -39,7 +39,10 @@
                 <passenger-view :trip-info="tripInfo" :user-info="userInfo" :user-reports="userReports" :user-contacts="userContacts" :user-locations="userLocations"></passenger-view>
             </template>
             <template v-else-if="userType == 'Driver'">
-                Driver!
+                <driver-view :data-from-marta="userInfo"></driver-view>
+            </template>
+            <template v-else-if="userType == 'Dispatcher'">
+                <dispatcher-view :data-from-marta="userInfo"></dispatcher-view>
             </template>
             <template v-else>
                 I don't know!
