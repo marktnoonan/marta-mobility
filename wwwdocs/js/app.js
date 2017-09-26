@@ -186,8 +186,8 @@ function showMyReports() {
     var prettyTime = makeTimePretty(reportTime);
     dbResults.reports[theReport]["prettyTime"] = prettyTime;
 
-    var lat = dbResults.reports[theReport].location.latitude;
-    var long = dbResults.reports[theReport].location.longitude;
+    var lat = dbResults.reports[theReport].location ? dbResults.reports[theReport].location.latitude : '';
+    var long = dbResults.reports[theReport].location ? dbResults.reports[theReport].location.longitude : '';
     if (typeof(dbResults.reports[theReport].prettyAddress) == 'undefined' || dbResults.reports[theReport].prettyAddress == '') {
       reverseGeocode(lat,long, theReport).then(function() {
         pushHandlebars(myReportTemplate, myInfoOutput);

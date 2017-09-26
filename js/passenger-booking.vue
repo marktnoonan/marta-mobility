@@ -12,8 +12,7 @@
       <b>End Window</b>: {{booking.displayEndWindow}}</span>
     <pizza-tracker :completed-steps="steps"></pizza-tracker>
     <div class="booking-status">
-      <b>Trip Status</b>: {{this.booking.Status}}
-      <span class="late-status">{{lateStatusText}}</span>
+      <b>Trip Status</b>: {{this.booking.Status}}<span class="late-status">{{lateStatusText}}</span>
     </div>
     <div class="times">
       <center>

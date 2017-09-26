@@ -1,337 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paratransit Pal</title>
-  <script src="./bower_components/handlebars/handlebars.min.js" charset="utf-8"></script>
-  <script src="./bower_components/promise-polyfill/promise.js" charset="utf-8"></script>
-  <link rel="stylesheet" href="./css/main.css">
+    <meta charset="utf-8">
+    <title>Paratransit Pal</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: soleil, Helvetica, Arial, sans-serif;
+            text-align: center;
+            font-size: 14px;
+            color: #444;
+            background-color: #fff;
+            padding-top: 45px;
+            overflow-x: hidden;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+    </style>
 </head>
 
-<body>
-  <div class="header">
-    <div class="logo">
-      <i class="fa fa-wheelchair-alt fa-lg" aria-hidden="true"></i> Paratransit Pal
+<body style="text-align:center">
+    <div id="app">
+        <login-form v-if="!loggedIn" v-on:login="login" :init-user-type="userType"></login-form>
+        <template v-if="loggedIn">
+            <template v-if="userType == 'Passenger'">
+                <passenger-view @update-info="updateFirebase($event)" @submit-report="submitReport($event)" :trip-info="tripInfo" :user-info="userInfo" :user-reports="userReports" :user-contacts="userContacts" :user-locations="userLocations"></passenger-view>
+            </template>
+            <template v-else-if="userType == 'Driver'">
+                <driver-view :data-from-marta="userInfo"></driver-view>
+            </template>
+            <template v-else-if="userType == 'Dispatcher'">
+                <dispatcher-view :data-from-marta="userInfo"></dispatcher-view>
+            </template>
+            <template v-else>
+                I don't know!
+            </template>
+        </template>
     </div>
-    <div class="menu-open">
-      <i class="fa fa-bars fa-lg" title="menu"></i>
-    </div>
-  </div>
-
-  <div class="menu-panel hidden">
-    <ul class="menu-list">
-      <li data-request="information">My Information</li>
-      <li data-request="reports">My Reports</li>
-      <li data-request="logout">Log Out</li>
-    </ul>
-  </div>
-
-  <div class="main">
-    <div class="text-align-center form-wrapper">
-      <form class="" id="unpw-form" method="post">
-        <h1 class="log-in">
-          Log In As:
-        </h1><br>
-        <select class="user-type" name="user-type">
-            <option value="Passenger">Passenger</option>
-              <option value="Driver">Driver</option>
-              <option value="Dispatcher">Dispatcher</option>
-        </select>
-        <br>
-        <input type="text" name="providedUsername" value="" placeholder="Client ID">
-        <br>
-        <input type="password" name="providedPassword" id="pw" value="" placeholder="Password">
-        <br><br><br>
-      </form>
-
-      <button type="button" id="login">Login</button>
-      <br><br><br> For a demo, enter username <b>test</b> and password <b>test</b>. Contact markthomasnoonan@gmail.com with
-      questions or feedback.
-    </div>
-
-
-    <div class="container" id="output">
-    </div>
-
-
-    <div class="my-info-output">
-      Here will be the information panel!
-    </div>
-
-    <script id="my-reports-template" type="text/x-handlebars-template">
-      <span class="closer-for-my-reports">×</span>
-      <h1>My Reports</h1>
-      {{#each dbResults.reports}}
-      <div class="card">
-        <div class="report-header"><span class="report-icon">{{{iconString}}}</span> "
-          <b>{{category}}</b>", report generated on
-          <br> {{prettyTime}}
-        </div>
-        {{#if comments}}
-        <span class="info-label">Comments</span>
-        <div class="report-info">{{comments}}</div>
-        {{/if}}
-        <span class="info-label">Location</span>
-        <div class="report-info">Near {{prettyAddress}}<br>(exact location: {{location.latitude}}, {{location.longitude}})</div>
-        {{#if nodedata}}<span class="info-label">Nearby Nodes</span>
-        <div class="report-info">
-          {{#each nodedata as |val key|}} {{val.envAssetUid}} {{/each}}
-        </div>
-        <span class="info-label">Traffic Speed</span>
-        <div class="report-info">{{nodedata.[0].vehicleSpeed}} mph
-        </div>
-        <span class="info-label">Nearby Vehicles</span>
-        <div class="report-info">{{nodedata.[0].vehicleCount}}
-        </div>
-        {{/if}}
-
-      </div>
-      {{/each}}
-    </script>
-
-    <script id="my-info-template" type="text/x-handlebars-template">
-      <span class="closer-for-my-info">×</span>
-      <h1>My Information</h1>
-
-      {{#with dbResults}}
-      <section data-key="info">
-        <h2>About Me</h2>
-        <br>
-        <div class="card">
-          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
-</span>
-          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{info.name}}</span><br>
-          <span class="info-label">Cell Number</span>: <span class="may-edit-text cell" data-text-type="cell">{{info.cell}}</span><br>
-          <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{info.email}}</span><br>
-          <span class="info-label">Tracking</span>: <span class="may-edit tracking">{{info.track}}</span>
-          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
-
-        </div>
-      </section>
-      <br>
-      <section data-key="emergency-contacts">
-        <h2>Emergency Contacts</h2>
-        <br> {{#each emergency-contacts}}
-        <div class="card">
-          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
-</span>
-          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="name">{{@key}}</span><br>
-          <span class="info-label" data-text-type="cell">Cell Number</span>: <span class="may-edit-text cell">{{this.cell}}</span><br>
-          <span class="info-label">Email</span>: <span class="may-edit-text email" data-text-type="email">{{this.email}}</span>
-          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
-
-        </div>
-        {{/each}}
-        <div class="card"><i class="fa fa-plus" aria-hidden="true"></i> Add an emergency contact</div>
-      </section>
-      <br>
-      <section data-key="saved-locations">
-        <h2>Saved Locations</h2>
-        <br> {{#each saved-locations}}
-        <div class="card">
-          <span class="edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
-</span>
-          <span class="info-label">Name</span>: <span class="may-edit-text name" data-text-type="short-name">{{@key}}</span><br>
-          <span class="info-label">Address</span>: <span class="may-edit-text address" data-text-type="{{@key}}">{{this}}</span><br>
-          <span class="done-editing hidden"><i class="fa fa-check" aria-hidden="true"></i> Done</span>
-        </div>
-        {{/each}}
-        <div class="card"><i class="fa fa-plus" aria-hidden="true"></i> Add a new location</div>
-      </section>
-      {{/with}}
-    </script>
-
-    <script id="driver-template" type="text/x-handlebars-template">
-      <div>
-        <div class="driver-info">
-          <br>
-          <h1>Driver View</h1>
-          <h2>Your Next Pickup</h2>
-          <br> Passenger: {{dataFromMarta.[0].clientName}}<br> {{#with dataFromMarta.[0].bookings.[0]}} Date: {{date}}<br>          Pick Up At {{pickupAddress}}<br> Drop Off At: {{dropOffAddress}}<br>
-          <hr>
-          <div class="driver-times">
-            <div class="driver-time">
-              <b>Ready Time</b><br> {{displayReadyTime}}
-            </div>
-            <div class="driver-time">
-              <b>Pickup ETA</b><br> {{displayEta}}
-            </div>
-          </div>
-          {{/with}}
-          <hr>
-          <h2>Add a Delay</h2>
-          <div class="driver-delay-options">
-            <div class="driver-delay-option" data-action="SMALL">
-              Small
-            </div>
-            <div class="driver-delay-option" data-action="MEDIUM">
-              Medium
-            </div>
-            <div class="driver-delay-option" data-action="LARGE">
-              Large
-            </div>
-            <div class="driver-delay-option" data-action="MAJOR">
-              Major
-            </div>
-          </div>
-
-        </div>
-    </script>
-
-    <script id="dispatcher-template" type="text/x-handlebars-template">
-      <div>
-        <h1> Dispatcher </h1>
-        <div class="driver-info">
-          <h3>Active trip for {{dataFromMarta.[0].clientName}}</h3><br> {{#with dataFromMarta.[0].bookings.[0]}} Date: {{date}}<br>          Passenger Ready Time: {{displayReadyTime}}<br> Stored ETA: {{displayEta}}<br> Pick Up At: {{pickupAddress}}<br>          Drop Off At: {{dropOffAddress}}<br> {{/with}}
-          <br>
-          <h2>Trip info</h2>
-          <br>
-          <b>Live Marta ETA</b>: <input type="text" class="eta-from-db" value="{{dbResults.etaFromMarta}}" onchange="changeETA(this.value)"></input>
-          <br>Edit as needed, please keep format HH:MM military time :)<br><br>
-          <b>Paratransit Pal Delay Modifier</b>: <span class="modifier-from-db">{{dbResults.modifier}} minutes extra delay</span>          <br><br>Modifier is calculated based on live node data and historical factors, if available. ETA shown to users
-          is a combination of these two pieces of information.
-
-        </div>
-
-      </div>
-    </script>
-
-
-    <script id="entry-template" type="text/x-handlebars-template">
-
-      <div class="client-info text-align-center">
-        Hi <b>{{dataFromMarta.[0].clientName}}!</b>
-        </>
-      </div>
-      <br>
-      </div>
-      {{#with dataFromMarta.[0].bookings.[0]}}
-      <h2>Your Next Trip</h2><br>
-      <div class="booking" id="booking{{@index}}">
-        <div class="date-and-id" id="date-and-id{{@index}}">
-          <span class="display-date">{{displayDate}}</span>
-          <span class="date">{{date}}</span>
-        </div>
-
-        <div class="ready-time-gage">{{displayReadyTime}}</div>
-        <div class="gauge-container">
-          <div id="g1" class="gauge"></div>
-        </div>
-        <span class="ready-time"><b>Start Window</b>: {{displayReadyTime}}</span>
-        <span class="ready-time"><b>End Window</b>: {{displayEndWindow}}</span>
-        <div class="pizza-tracker">
-
-          <div class="booked future-step" data-text="">
-            <div class="straighten"><i class="fa fa-calendar fa-lg"></i>
-            </div>
-          </div>
-
-          <div class="scheduled future-step" data-text="">
-            <div class="straighten"><i class="fa fa-ticket fa-lg"></i>
-
-            </div>
-          </div>
-
-          <div class="trip-soon future-step" data-text="">
-            <div class="straighten"><i class="fa fa-road fa-lg"></i>
-            </div>
-          </div>
-
-          <div class="five-minutes future-step" data-text="">
-            <div class="straighten"><i class="fa fa-clock-o fa-lg"></i>
-
-            </div>
-          </div>
-
-          <div class="here-now future-step" data-text="">
-            <div class="straighten">
-              <div class="bell"><i class="fa fa-bell-o fa-lg"></i></div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="booking-status"><b>Trip Status</b>: {{Status}}<span class="late-status"></span></div>
-
-        <div class="times">
-
-          <center>
-
-            <div class="eta">{{#if displayEta}} <i class="fa fa-clock-o fa-lg"></i> <b>ETA</b>: {{displayEta}} {{else}}No van is scheduled
-              for this trip. {{/if}}
-
-            </div>
-
-            <!-- Not using this right now while we are just displaying one trip.
-            <span id="details{{@index}}" class="more-details"><i class="fa fa-chevron-down" aria-hidden="true"></i> -->
-            </span>
-          </center>
-        </div>
-        <div class="locations" id="locations{{@index}}">
-          <span class="booking-id"><b>Booking ID</b>: {{bookingID}}</span>
-          <div class="pickup"><b>From</b>: {{pickupAddress}}</div>
-          <div class="dropoff"><b>To</b>: {{dropOffAddress}}</div>
-        </div>
-      </div> {{/with}}
-
-    </script>
-
-  </div>
-
-  <div class="bottom-menu hidden">
-    <span class="bottom-show-menu-link">Help
-</span>
-    <a href="tel:1-678-488-3081">
-      <div class="emergency" data-action="Call 911">
-        <i class="fa fa-ambulance fa-lg" aria-hidden="true"></i> 911 EMERGENCY
-      </div>
-    </a>
-    <div class="bottom-menu-item" data-action="I am lost">
-      <i class="fa fa-map-marker fa-2x" aria-hidden="true"></i> <br><br>I am <b>LOST</b>
-    </div>
-    <div class="bottom-menu-item" data-action="I need help">
-      <i class="fa fa-flag fa-2x" aria-hidden="true"></i><br><br>I need <b>HELP</b>
-    </div>
-    <div class="bottom-menu-item" data-action="Incident Report">
-      <i class="fa fa-info-circle fa-2x" aria-hidden="true"></i><br><br>Report <b>INCIDENT</b>
-    </div>
-    <div class="bottom-menu-item" data-action="Crime Report">
-      <i class="fa fa-gavel fa-2x" aria-hidden="true"></i><br><br>Report <b>CRIME</b>
-    </div>
-  </div>
-
-  <div class="make-report">
-    <span class="closer">×</span>
-    <h1 id="report-category"></h1>
-    <span id="action-specific-text"></span>
-    <form class="make-report-form">
-      <b>Add to report:</b><br><br>
-      <center>
-        <textarea name="what-happened"></textarea><br><br>
-        <button type="button" name="submit-report">Complete Report</button>
-      </center>
-    </form>
-  </div>
-  <script src="https://use.fontawesome.com/11bf80d1ff.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
-  <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
-      authDomain: "mobility-eta.firebaseapp.com",
-      databaseURL: "https://mobility-eta.firebaseio.com",
-      projectId: "mobility-eta",
-      storageBucket: "",
-      messagingSenderId: "142807263400"
-    };
-    firebase.initializeApp(config);
-  </script>
-  <script src="./bower_components/raphael/raphael.min.js"></script>
-  <script src="./bower_components/justgage-toorshia/justgage.js"></script>
-  <script src="./js/sendReport.js"></script>
-  <script src="./js/app.js"></script>
+    <script src="../bower_components/vue/dist/vue.js" charset="utf-8"></script>    
+    <script src="https://use.fontawesome.com/11bf80d1ff.js"></script>
+    <script src="./bower_components/raphael/raphael.js"></script>
+    <script src="./bower_components/justgage-toorshia/justgage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+    <script src="dist/build.js"></script>
 </body>
 
 </html>
