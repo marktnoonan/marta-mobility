@@ -42,7 +42,7 @@ $app->add(function ($req, $res, $next) {
 });
 
 $app->post('/login', function ($request, $response, $args) {
-    $data[] = $this['scraper']->getData();
+    $data = $this['scraper']->getData();
     $response = $response->withJson($data);
     return $response;
 });
