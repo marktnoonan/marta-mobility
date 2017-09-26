@@ -36,7 +36,7 @@
         <login-form v-if="!loggedIn" v-on:login="login" :init-user-type="userType"></login-form>
         <template v-if="loggedIn">
             <template v-if="userType == 'Passenger'">
-                <passenger-view :trip-info="tripInfo" :user-info="userInfo" :user-reports="userReports" :user-contacts="userContacts" :user-locations="userLocations"></passenger-view>
+                <passenger-view @update-info="updateFirebase($event)" @submit-report="submitReport($event)" :trip-info="tripInfo" :user-info="userInfo" :user-reports="userReports" :user-contacts="userContacts" :user-locations="userLocations"></passenger-view>
             </template>
             <template v-else-if="userType == 'Driver'">
                 <driver-view :data-from-marta="userInfo"></driver-view>

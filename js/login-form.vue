@@ -38,7 +38,7 @@ export default {
   mounted: function() {
     setTimeout((function() {
       this.rendered = true;
-    }).bind(this), 1000);
+    }).bind(this));
   },
   props: ["initUserType"],
   methods: {

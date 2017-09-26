@@ -19,8 +19,8 @@
                 <passenger-booking :booking="userInfo.bookings[0]" :idx="0" :trip-info="tripInfo"></passenger-booking>
             </div>
         </div>
-        <report-form v-if="showReportForm" v-on:help-event="handleHelpEvent($event)" :help-report="helpReport"></report-form>
-        <bottom-menu v-on:help-event="handleHelpEvent($event)"></bottom-menu>
+        <report-form v-if="showReportForm" @help-event="handleHelpEvent($event)" @complete-report="submitReport($event)" :help-report="helpReport"></report-form>
+        <bottom-menu @help-event="handleHelpEvent($event)"></bottom-menu>
     </div>
 </template>
 
@@ -70,7 +70,14 @@ export default {
             }
         },
         updateInfo: function($event) {
-            this.userInfo.fbUserInfo.name = 'test';
+            switch ($event.type) {
+                case 'userInfo': this.$emit('update-info', $event);
+            }
+        },
+        submitReport: function($event) {
+            delete $event.text;
+            $event.userId = this.userInfo.userId;
+            this.$emit('submit-report', $event);
         }
     }
 }

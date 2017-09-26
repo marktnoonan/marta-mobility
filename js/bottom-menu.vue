@@ -34,6 +34,13 @@ const helpTexts = {
     "crime" : "that you are reporting a crime. "
 };
 
+const helpCats = {
+    'lost': 'I am lost',
+    'help': 'I need help',
+    'incident': 'Incident report',
+    'crime': 'Crime report'
+};
+
 
 export default {
     data: function() {
@@ -46,8 +53,9 @@ export default {
             this.menu = !this.menu;
         },
         emitHelp: function($event) {
+            var helpType = $event.currentTarget.dataset.action;
             this.menu = !this.menu;
-            this.$emit('help-event', {text: helpTexts[$event.currentTarget.dataset.action]});
+            this.$emit('help-event', {time: (new Date()).getTime(), text: helpTexts[helpType], category: helpCats[helpType]});
         }
     }
 }

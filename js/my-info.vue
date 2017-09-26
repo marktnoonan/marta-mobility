@@ -75,7 +75,17 @@ export default {
             this.userLocations.push({});
         },
         updateInfo: function() {
-            this.$emit('update-info', { type: 'userInfo', info: this.userInfo });
+            this.$emit('update-info',
+                {
+                    type: 'userInfo',
+                    info: {
+                        name: this.userInfo.name,
+                        cell: this.userInfo.cell,
+                        email: this.userInfo.email,
+                        track: this.userInfo.track
+                    }
+                }
+            );
         },
         updateContacts: function() {
             this.$emit('update-info', { type: 'contacts', info: this.userContacts });

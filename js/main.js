@@ -6,22 +6,22 @@ import DispatcherView from './dispatcher-view.vue';
 
 const LOGIN_URL = "./api/test";
 
-/* var firebaseApp = firebase.initializeApp({
+var config = {
     apiKey: "AIzaSyAVILGslPYXyEa1kF84vxk3d2OxKzxhweo",
     authDomain: "mobility-66c54.firebaseapp.com",
     databaseURL: "https://mobility-66c54.firebaseio.com",
     projectId: "mobility-66c54",
     storageBucket: "mobility-66c54.appspot.com",
     messagingSenderId: "582170341021"
-}); */
-var config = {
+};
+/* var config = {
     apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
     authDomain: "mobility-eta.firebaseapp.com",
     databaseURL: "https://mobility-eta.firebaseio.com",
     projectId: "mobility-eta",
     storageBucket: "",
     messagingSenderId: "142807263400"
-  };
+  }; */
   var firebaseApp = firebase.initializeApp(config);
 var db = firebaseApp.database();
 
@@ -100,6 +100,15 @@ new Vue({
                 };
                 xhr.send(params);
             });
+        },
+        updateFirebase: function($event) {
+            switch ($event.type) {
+                case 'userInfo': this.$firebaseRefs.myInfoRef.set($event.info);break;
+            }
+        },
+        submitReport: function($event) {
+            var reportId = this.userInfo.userId + '_' + Math.round((new Date()).getTime() / 1000);
+            this.$firebaseRefs.reports.child(reportId).set($event);
         }
     }
 });

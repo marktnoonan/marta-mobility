@@ -12,7 +12,8 @@
       <b>End Window</b>: {{booking.displayEndWindow}}</span>
     <pizza-tracker :completed-steps="steps"></pizza-tracker>
     <div class="booking-status">
-      <b>Trip Status</b>: {{this.booking.Status}}<span class="late-status">{{lateStatusText}}</span>
+      <b>Trip Status</b>: {{this.booking.Status}}
+      <span class="late-status">{{lateStatusText}}</span>
     </div>
     <div class="times">
       <center>
@@ -61,11 +62,14 @@ export default {
     newEta: function() {
       var eta;
       if (this.tripInfo.eta) {
-         eta = this.tripInfo.eta[".value"];
+        eta = this.convertTimeToMinutes(this.tripInfo.eta[".value"]);
       } else {
-        eta = this.booking.eta;
+        eta = this.convertTimeToMinutes(this.booking.eta);
       }
-      return this.convertTimeFromMinutes(this.convertTimeToMinutes(eta));
+      if (this.tripInfo.modifier) {
+        eta = eta + Number(this.tripInfo.modifier[".value"]);
+      }
+      return this.convertTimeFromMinutes(eta);
     },
     steps: function() {
       var ret = {};
@@ -195,6 +199,4 @@ div.locations {
   font-size: 12px;
   margin-bottom: 8px;
 }
-
-
 </style>
