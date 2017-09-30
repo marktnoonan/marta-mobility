@@ -6,6 +6,9 @@
 
 
 <script>
+//var Raphael = require('justgage/raphael-2.1.4.min')
+var gage = require('JustGage');
+
 export default {
     directives: {
         gauge: {

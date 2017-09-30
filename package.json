@@ -2,6 +2,8 @@
   "name": "paratransit-pal",
   "description": "Paratransit Pal",
   "dependencies": {
+    "firebase": "^4.4.0",
+    "justgage": "git://github.com/intrising/justgage.git",
     "vue": "^2.4.4"
   },
   "devDependencies": {
@@ -15,5 +17,10 @@
     "vue-template-compiler": "^2.3.3",
     "webpack": "^2.6.1",
     "webpack-dev-server": "^2.4.5"
+  },
+  "scripts": {
+    "postinstall": "composer install",
+    "build": "webpack",
+    "start": "webpack --watch"
   }
 }

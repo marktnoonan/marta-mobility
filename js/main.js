@@ -1,11 +1,14 @@
-/* import Vue from 'vue';
- */import LoginForm from './login-form.vue';
+import Vue from 'vue';
+import LoginForm from './login-form.vue';
 import PassengerView from './passenger-view.vue';
 import DriverView from './driver-view.vue';
 import DispatcherView from './dispatcher-view.vue';
+import firebase from 'firebase';
+import VueFire from 'vuefire';
 
 const LOGIN_URL = "./api/login";
 
+Vue.use(VueFire);
 
 var firebaseConfig = {
     apiKey: "AIzaSyCf7rZkSE6Xnl4Ag-vxhrrtGWs2yosf0pA",
